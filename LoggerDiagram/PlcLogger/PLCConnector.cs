@@ -29,6 +29,7 @@ namespace LoggerDiagram
                 {
                     plc.Open();
                     plcaDatas = AddPlcData(19);
+                    //add();
                 }
             }
             catch (Exception ex)
@@ -43,6 +44,14 @@ namespace LoggerDiagram
 
             return plcaDatas;
         }
+        private void add()
+        {
+            if (plc.IsConnected != true)
+                plc.Open();
+
+            int f = (int)plc.Read(DataType.DataBlock, 1, 8, VarType.Int, 1);
+            int g = 10;
+        }
 
         private List<PlcData> AddPlcData(int count) //+2
         {
@@ -50,6 +59,7 @@ namespace LoggerDiagram
             List<PlcData> plcaDatas = new List<PlcData>();
             int byteCount = 0;
             int doubleCount = 2;
+            int timeCount = 6;
             try
             {
                 if (plc.IsConnected != true)
@@ -57,11 +67,20 @@ namespace LoggerDiagram
 
                 for (int i = 0; i < count; i++)
                 {
-                    plcaDatas.Add(new PlcData(roomNameEnum,
-                    (byte)plc.Read(DataType.DataBlock, 1, byteCount, VarType.Byte, 1),
-                    (float)plc.Read(DataType.DataBlock, 1, doubleCount, VarType.Real, 1)));
-                    byteCount += 6;
-                    doubleCount += 6;
+                    plcaDatas.Add
+                        (
+                            new PlcData
+                            (
+                                roomNameEnum,
+                                (byte)plc.Read(DataType.DataBlock, 1, byteCount, VarType.Byte, 1),
+                                (float)plc.Read(DataType.DataBlock, 1, doubleCount, VarType.Real, 1),
+                                (short)plc.Read(DataType.DataBlock,1, timeCount,VarType.Int,1)
+                            )
+                        );
+
+                    byteCount += 8;
+                    doubleCount += 8;
+                    timeCount += 8;
                     roomNameEnum++;
                 }
             }
@@ -84,7 +103,7 @@ namespace LoggerDiagram
             Console.WriteLine("################################################");
             foreach (var item in plcaDatas)
             {
-                Console.WriteLine($"Имя - {item.getNameRoom()}; Байт - {item.GetByte()}; Данные - {item.GetDouble()};\n");
+                Console.WriteLine($"Имя - {item.getNameRoom()}; Байт - {item.GetByte()}; Данные - {item.GetFloat()}; Time - {item.GetTime()}");
                 if (item.GetByte() > (byte)0)
                     coutOne++;
                 else
@@ -96,12 +115,9 @@ namespace LoggerDiagram
             return plcaDatas;
         }
 
-        public void CheckUpdate(List<PlcData> plcaDatas)
+        public void UpdatOldInfo(List<PlcData> plcaDatas)
         {
-            DataBase dataBase = new DataBase();
-
             oldPlcDatas.Clear();
-
             StatusByteEnum statusByteEnum;
 
             foreach (var item in plcaDatas)
@@ -113,7 +129,9 @@ namespace LoggerDiagram
                         break;
                     case 1:
                         statusByteEnum = StatusByteEnum.One;
-                        //dataBase.SendData();
+                        break;
+                    case 22:
+                        statusByteEnum = StatusByteEnum.One;
                         break;
                     default:
                         statusByteEnum = StatusByteEnum.Error;
@@ -122,6 +140,43 @@ namespace LoggerDiagram
 
                 oldPlcDatas.Add(new OldPlcData(item.getNameRoom(), statusByteEnum));
             }
+        }
+
+        public void CheckUpdate(List<PlcData> plcaDatas)
+        {
+            bool isSendMessage = false;
+            DataBase dataBase = new DataBase();
+
+            foreach (var item in plcaDatas)
+            {
+                switch (item.GetByte())
+                {
+                    case 0:
+                        break;
+                    case 1:
+                        isSendMessage = dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
+                        break;
+                    case 22:
+                        isSendMessage =dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
+                        break;
+                    default:
+                        break;
+                }
+            }
+            Console.WriteLine($"isSendMessage - {isSendMessage}");
+        }
+
+        private StatusByteEnum GetOldStatusByteEnum(RoomNameEnum room)
+        {
+            StatusByteEnum statusByte = StatusByteEnum.Error;
+            foreach (var item in oldPlcDatas)
+            {
+                if(item.GetRoomName() == room)
+                {
+                    return statusByte = item.GetStatusByte();
+                }
+            }
+            return statusByte;
         }
     }
 }

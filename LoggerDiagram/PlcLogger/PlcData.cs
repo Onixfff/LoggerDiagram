@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LoggerDiagram
 {
@@ -11,17 +7,19 @@ namespace LoggerDiagram
         private RoomNameEnum RoomName;
         private Byte BytePlc;
         private float DoublePlc;
+        private int Time;
 
-        public PlcData(RoomNameEnum roomName, Byte bytePlc, float doublePlc)
+        public PlcData(RoomNameEnum roomName, Byte bytePlc, float doublePlc, int time)
         {
             RoomName = roomName;
             BytePlc = bytePlc;
             DoublePlc = doublePlc;
+            Time = time;
         }
 
         public bool GetIsNewDiagramId()
         {
-            if((int)BytePlc > 0)
+            if ((int)BytePlc > 0)
                 return true;
             else
                 return false;
@@ -33,7 +31,7 @@ namespace LoggerDiagram
             return BytePlc;
         }
 
-        public Double GetDouble()
+        public float GetFloat()
         {
             return DoublePlc;
         }
@@ -41,6 +39,11 @@ namespace LoggerDiagram
         public RoomNameEnum getNameRoom()
         {
             return RoomName;
+        }
+
+        public int GetTime()
+        {
+            return Time;
         }
 
     }

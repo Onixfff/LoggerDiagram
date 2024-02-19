@@ -15,17 +15,17 @@ namespace LoggerDiagram
             {
                 try
                 {
-                    //List<PlcaData> data1 = new List<PlcaData>();
-                    //Thread thread = new Thread(() => {plc1.ShowLog(data1 = plc1.TryTakesData()); });
-                    //ThreadPool.QueueUserWorkItem(() => { data1 = plc1.TryTakesData(); });
                     
                     //Получение данных с PLC
-                    var data1 = plc1.ShowLog(plc1.TryTakesData());
                     var data2 = plc2.ShowLog(plc2.TryTakesData());
-
-                    //Проверка данных и составление данных для старого списка
-                    plc1.CheckUpdate(data1);
                     plc2.CheckUpdate(data2);
+                    plc2.UpdatOldInfo(data2);
+
+                    //Проверка данных (отправка пройденных данных) и составление данных для старого списка
+                    var data1 = plc1.ShowLog(plc1.TryTakesData());
+                    plc1.CheckUpdate(data1);
+                    plc1.UpdatOldInfo(data1);
+
 
 
                 }
