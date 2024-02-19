@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Threading;
 
 namespace LoggerDiagram
@@ -7,23 +8,22 @@ namespace LoggerDiagram
     {
         static void Main(string[] args)
         {
-            PLCConnector plc1= new PLCConnector("192.168.37.104");
-            PLCConnector plc2 = new PLCConnector("192.168.37.103");
+            PLCConnector plc1 = new PLCConnector(ConfigurationManager.AppSettings["PlcEven"]);
+            PLCConnector plc2 = new PLCConnector(ConfigurationManager.AppSettings["PlcOdd"]);
             while (true)
             {
                 try
                 {
-                    var data = plc1.TryTakesData();
-                    plc1.ShowLog(data);
-                    var data2 = plc2.TryTakesData();
-                    plc2.ShowLog(data2);
+                    Thread data1 = new Thread(x=>plc1.ShowLog(plc1.TryTakesData()));
+                    data1.Start();
+                    plc2.ShowLog(plc2.TryTakesData());
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message +"\nСтрока - " + ex.StackTrace);
                     throw;
                 }
-                Thread.Sleep(500);
+                finally {Thread.Sleep(500); }
             }
         }
     }

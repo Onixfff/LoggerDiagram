@@ -6,15 +6,14 @@ namespace LoggerDiagram
     public class PlcConnection
     {
         private string _ip;
-        public PlcConnection()
+        public PlcConnection(string ip)
         {
-            
+            _ip = ip;
         }
 
-        public Plc GetConnectionEven(string ip) //ConfigurationManager.AppSettings["PlcEven"]
+        public Plc GetConnection() //ConfigurationManager.AppSettings["PlcEven"]
         {
-            Plc plc = new Plc(CpuType.S71200,ip ,0,1);
-            plc.Open();
+            Plc plc = new Plc(CpuType.S71200, _ip ,0,1);
             return plc;
         }
     }

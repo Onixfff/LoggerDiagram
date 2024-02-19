@@ -8,7 +8,9 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace LoggerDiagram
 {
@@ -18,17 +20,20 @@ namespace LoggerDiagram
 
         public PLCConnector(string ipEven)
         {
-            plc = new Plc(CpuType.S71200, ipEven, 0, 1); //четные 192.168.37.104
-            
-            //Plc plcOdd = new Plc(CpuType.S71200, ipOdd, 0, 1); //нечетные 192.168.37.103
+            plc = new PlcConnection(ipEven).GetConnection();
         }
 
         public List<PlcaData> TryTakesData()
         {
             List<PlcaData> plcaDatas = new List<PlcaData>();
+
             try
             {
-                var plcDatas = AddPlcData(0, 74, 37);
+                lock (plc)
+                {
+                    plc.Open();
+                    var plcDatas = AddPlcData(0, 74, 37);
+                }
             }
             catch (Exception ex)
             {
@@ -39,14 +44,19 @@ namespace LoggerDiagram
             {
                 plc.Close();
             }
+
             return plcaDatas;
         }
 
         private List<PlcaData> AddPlcData(int from, int before, int count)
         {
             List<PlcaData> plcaDatas = new List<PlcaData>();
+
             try
             {
+                if (plc.IsConnected != true)
+                    plc.Open();
+
                 for (int i = 0; i < count; i++)
                 {
                     plcaDatas.Add(new PlcaData(RoomNameEnum.graph3,
@@ -58,14 +68,19 @@ namespace LoggerDiagram
             {
                 Console.WriteLine(ex.Message + "\n" + ex.TargetSite);
             }
-            finally { plc.Close(); }
+            finally 
+            { 
+                plc.Close();
+            }
+
             return plcaDatas;
         }
 
         public void ShowLog(List<PlcaData> plcaDatas)
         {
             int coutOne = 0;
-            int counZero = 0; 
+            int counZero = 0;
+            Console.WriteLine("################################################");
             foreach (var item in plcaDatas)
             {
                 Console.WriteLine($"Имя - {item.getNameRoom()}; Байт - {item.GetByte()}; Данные - {item.GetDouble()};\n");
@@ -74,7 +89,9 @@ namespace LoggerDiagram
                 else
                     counZero++;
             }
-            Console.WriteLine($"Счётчик больше 0 = {coutOne} Счетчик == 0 = {counZero}");
+
+            Console.WriteLine($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutOne})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}");
+            Console.WriteLine("################################################");
         }
     }
 }
