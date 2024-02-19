@@ -15,12 +15,7 @@ namespace LoggerDiagram.DB
         private readonly string _connectionString = ConfigurationManager.ConnectionStrings["DB"].ConnectionString;
         MySqlConnection _connection;
 
-        public DataBase()
-        {
-
-        }
-
-        public bool SendData(RoomNameEnum room, int idGraph, DateTime time, string value)
+        public bool SendData(RoomNameEnum room, float value)
         {
             using (_connection = new MySqlConnection(_connectionString))
             {
@@ -30,16 +25,13 @@ namespace LoggerDiagram.DB
                     _connection.Open();
                 try
                 {
-                    var sqlDate = time.Date.ToString("yyyy-MM-dd HH:mm:ss");
-                    string sql = $"INSERT INTO `diagramrooms`.`{room}` (`idgraph`, `time`, `value`) VALUES('{idGraph}', '{sqlDate}', '{value}');";
+                    DateTime date = DateTime.Now;
+                    var sqlDate = date.Date.ToString("yyyy-MM-dd HH:mm:ss");
+                    string sql = $"INSERT INTO `diagramrooms`.`{room}` (`idgraph`, `time`, `value`) VALUES('{GetLastDiagramId(room)}', '{sqlDate}', '{value}');";
                     MySqlCommand cmd = new MySqlCommand(sql, _connection);
 
-                    int rowCount = cmd.ExecuteNonQuery();
-                    Console.WriteLine("Row Count affected = " + rowCount);
-                    if (rowCount > 1)
-                        isSendMessage = true;
-                    else
-                        Console.WriteLine("Row Count affected = " + rowCount);
+                    cmd.ExecuteNonQuery();
+                    isSendMessage = true;
                 }
                 catch (Exception e)
                 {
@@ -55,6 +47,35 @@ namespace LoggerDiagram.DB
                         Console.WriteLine("Сообщение не доставлено");
                 }
                 return isSendMessage;
+            }
+        }
+
+        public int GetLastDiagramId(RoomNameEnum roomName)
+        {
+            int lastIndex = -1;
+            using (_connection = new MySqlConnection(_connectionString))
+            {
+                var isState = _connection.State;
+                if (isState == System.Data.ConnectionState.Closed)
+                    _connection.Open();
+
+                try
+                {
+                    string sql = $"SELECT idgraph FROM diagramrooms.{roomName} ORDER BY id DESC LIMIT 1";
+                    MySqlCommand cmd = new MySqlCommand();
+                    MySqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        lastIndex = (int)reader[1];
+                    }
+
+                }
+                catch (Exception e)
+                {
+
+                }
+                finally { _connection.Close(); }
+                return lastIndex;
             }
         }
     }

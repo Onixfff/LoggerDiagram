@@ -11,9 +11,9 @@ namespace LoggerDiagram
             _ip = ip;
         }
 
-        public Plc GetConnection() //ConfigurationManager.AppSettings["PlcEven"]
+        public S7.Net.Plc GetConnection() //ConfigurationManager.AppSettings["PlcEven"]
         {
-            Plc plc = new Plc(CpuType.S71200, _ip ,0,1);
+            S7.Net.Plc plc = new S7.Net.Plc(CpuType.S71200, _ip ,0,1);
             return plc;
         }
     }

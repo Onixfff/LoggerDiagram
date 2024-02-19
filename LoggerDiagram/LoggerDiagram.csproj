@@ -102,10 +102,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DB\DataBase.cs" />
-    <Compile Include="PlcLogger\OldOlcaData.cs" />
+    <Compile Include="PlcLogger\OldPlcData.cs" />
     <Compile Include="PlcLogger\PlcaData.cs" />
     <Compile Include="PlcLogger\PlcConnection.cs" />
-    <Compile Include="PlcLogger\PLCConnector.cs" />
+    <Compile Include="PlcLogger\PlcConnector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enum\RoomNameEnum.cs" />

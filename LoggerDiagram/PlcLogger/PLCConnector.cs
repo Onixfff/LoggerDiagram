@@ -1,28 +1,34 @@
-﻿using S7.Net;
+﻿using LoggerDiagram.DB;
+using LoggerDiagram.Plc;
+using S7.Net;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Threading;
 
 namespace LoggerDiagram
 {
-    internal class PLCConnector
+    internal class PlcConnector
     {
         private S7.Net.Plc plc;
+        private List<OldPlcData> oldPlcDatas = new List<OldPlcData>();
+        private List<byte> bytes = new List<byte>();
 
-        public PLCConnector(string ipEven)
+        public PlcConnector(string ipEven)
         {
             plc = new PlcConnection(ipEven).GetConnection();
         }
 
-        public List<PlcaData> TryTakesData()
+        public List<PlcData> TryTakesData()
         {
-            List<PlcaData> plcaDatas = new List<PlcaData>();
+            List<PlcData> plcaDatas = new List<PlcData>();
 
             try
             {
                 lock (plc)
                 {
                     plc.Open();
-                    var plcDatas = AddPlcData(19);
+                    plcaDatas = AddPlcData(19);
                 }
             }
             catch (Exception ex)
@@ -38,9 +44,10 @@ namespace LoggerDiagram
             return plcaDatas;
         }
 
-        private List<PlcaData> AddPlcData(int count) //+2
+        private List<PlcData> AddPlcData(int count) //+2
         {
-            List<PlcaData> plcaDatas = new List<PlcaData>();
+            RoomNameEnum roomNameEnum = 0;
+            List<PlcData> plcaDatas = new List<PlcData>();
             int byteCount = 0;
             int doubleCount = 2;
             try
@@ -50,26 +57,27 @@ namespace LoggerDiagram
 
                 for (int i = 0; i < count; i++)
                 {
-                    plcaDatas.Add(new PlcaData(RoomNameEnum.graph3,
+                    plcaDatas.Add(new PlcData(roomNameEnum,
                     (byte)plc.Read(DataType.DataBlock, 1, byteCount, VarType.Byte, 1),
-                    (double)plc.Read(DataType.DataBlock, 1, doubleCount, VarType.Real, 1)));
-                    byteCount += 2;
-                    doubleCount += 2;
+                    (float)plc.Read(DataType.DataBlock, 1, doubleCount, VarType.Real, 1)));
+                    byteCount += 6;
+                    doubleCount += 6;
+                    roomNameEnum++;
                 }
             }
-            catch(PlcException ex)
+            catch (PlcException ex)
             {
                 Console.WriteLine(ex.Message + "\n" + ex.TargetSite);
             }
-            finally 
-            { 
+            finally
+            {
                 plc.Close();
             }
 
             return plcaDatas;
         }
 
-        public void ShowLog(List<PlcaData> plcaDatas)
+        public List<PlcData> ShowLog(List<PlcData> plcaDatas)
         {
             int coutOne = 0;
             int counZero = 0;
@@ -83,8 +91,37 @@ namespace LoggerDiagram
                     counZero++;
             }
 
-            Console.WriteLine($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutOne})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}");
+            Console.WriteLine($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutOne})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}/{Thread.CurrentThread.Name}");
             Console.WriteLine("################################################");
+            return plcaDatas;
+        }
+
+        public void CheckUpdate(List<PlcData> plcaDatas)
+        {
+            DataBase dataBase = new DataBase();
+
+            oldPlcDatas.Clear();
+
+            StatusByteEnum statusByteEnum;
+
+            foreach (var item in plcaDatas)
+            {
+                switch (item.GetByte())
+                {
+                    case 0:
+                        statusByteEnum = StatusByteEnum.Zero;
+                        break;
+                    case 1:
+                        statusByteEnum = StatusByteEnum.One;
+                        //dataBase.SendData();
+                        break;
+                    default:
+                        statusByteEnum = StatusByteEnum.Error;
+                        break;
+                }
+
+                oldPlcDatas.Add(new OldPlcData(item.getNameRoom(), statusByteEnum));
+            }
         }
     }
 }

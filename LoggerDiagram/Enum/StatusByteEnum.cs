@@ -10,5 +10,6 @@ namespace LoggerDiagram
     {
         Zero = 0,
         One = 1,
+        Error = 100
     }
 }

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace LoggerDiagram
 {
-    public class PlcaData
+    public class PlcData
     {
         private RoomNameEnum RoomName;
         private Byte BytePlc;
-        private double DoublePlc;
+        private float DoublePlc;
 
-        public PlcaData(RoomNameEnum roomName, Byte bytePlc, double doublePlc)
+        public PlcData(RoomNameEnum roomName, Byte bytePlc, float doublePlc)
         {
             RoomName = roomName;
             BytePlc = bytePlc;
