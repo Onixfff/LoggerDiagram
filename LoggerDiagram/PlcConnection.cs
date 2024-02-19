@@ -10,6 +10,7 @@ namespace LoggerDiagram
         {
             
         }
+
         public Plc GetConnectionEven(string ip) //ConfigurationManager.AppSettings["PlcEven"]
         {
             Plc plc = new Plc(CpuType.S71200,ip ,0,1);
