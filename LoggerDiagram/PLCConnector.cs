@@ -153,7 +153,7 @@ namespace LoggerDiagram
             return plcaDatas;
         }
 
-        private void ShowLog(List<PlcaData> plcaDatas)
+        public void ShowLog(List<PlcaData> plcaDatas)
         {
             foreach (var item in plcaDatas)
             {

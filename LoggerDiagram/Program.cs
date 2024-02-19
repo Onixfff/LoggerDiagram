@@ -13,8 +13,10 @@ namespace LoggerDiagram
             {
                 try
                 {
-                    plc1.TryTakesData();
-                    plc2.TryTakesData();
+                    var data = plc1.TryTakesData();
+                    plc1.ShowLog(data);
+                    var data2 = plc2.TryTakesData();
+                    plc2.ShowLog(data2);
                 }
                 catch (Exception ex)
                 {
