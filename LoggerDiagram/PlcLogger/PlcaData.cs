@@ -19,6 +19,15 @@ namespace LoggerDiagram
             DoublePlc = doublePlc;
         }
 
+        public bool GetIsNewDiagramId()
+        {
+            if((int)BytePlc > 0)
+                return true;
+            else
+                return false;
+
+        }
+
         public Byte GetByte()
         {
             return BytePlc;

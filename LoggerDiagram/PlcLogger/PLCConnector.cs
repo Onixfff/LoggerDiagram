@@ -1,22 +1,12 @@
 ﻿using S7.Net;
-using S7.Net.Protocol;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace LoggerDiagram
 {
     internal class PLCConnector
     {
-        private Plc plc;
+        private S7.Net.Plc plc;
 
         public PLCConnector(string ipEven)
         {
