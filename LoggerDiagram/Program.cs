@@ -23,7 +23,7 @@ namespace LoggerDiagram
                     Console.WriteLine(ex.Message +"\nСтрока - " + ex.StackTrace);
                     throw;
                 }
-                finally {Thread.Sleep(500); }
+                finally {Thread.Sleep(5000); }
             }
         }
     }

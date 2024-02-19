@@ -32,7 +32,7 @@ namespace LoggerDiagram
                 lock (plc)
                 {
                     plc.Open();
-                    var plcDatas = AddPlcData(0, 74, 37);
+                    var plcDatas = AddPlcData(19);
                 }
             }
             catch (Exception ex)
@@ -48,10 +48,11 @@ namespace LoggerDiagram
             return plcaDatas;
         }
 
-        private List<PlcaData> AddPlcData(int from, int before, int count)
+        private List<PlcaData> AddPlcData(int count) //+2
         {
             List<PlcaData> plcaDatas = new List<PlcaData>();
-
+            int byteCount = 0;
+            int doubleCount = 2;
             try
             {
                 if (plc.IsConnected != true)
@@ -60,8 +61,10 @@ namespace LoggerDiagram
                 for (int i = 0; i < count; i++)
                 {
                     plcaDatas.Add(new PlcaData(RoomNameEnum.graph3,
-                    (byte)plc.Read(DataType.DataBlock, 1, 70, VarType.Byte, 1),
-                    (double)plc.Read(DataType.DataBlock, 1, 71, VarType.Real, 1)));
+                    (byte)plc.Read(DataType.DataBlock, 1, byteCount, VarType.Byte, 1),
+                    (double)plc.Read(DataType.DataBlock, 1, doubleCount, VarType.Real, 1)));
+                    byteCount += 2;
+                    doubleCount += 2;
                 }
             }
             catch(PlcException ex)
