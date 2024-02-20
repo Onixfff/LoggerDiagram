@@ -9,8 +9,8 @@ namespace LoggerDiagram
     {
         static void Main(string[] args)
         {
-            PlcConnector plc1 = new PlcConnector(ConfigurationManager.AppSettings["PlcEven"]);
-            PlcConnector plc2 = new PlcConnector(ConfigurationManager.AppSettings["PlcOdd"]);
+            PlcConnector plc1 = new PlcConnector(ConfigurationManager.AppSettings["PlcOdd"]);
+            PlcConnector plc2 = new PlcConnector(ConfigurationManager.AppSettings["PlcEven"]);
             while (true)
             {
                 try
@@ -21,7 +21,6 @@ namespace LoggerDiagram
                     plc2.CheckUpdate(data2);
                     plc2.UpdatOldInfo(data2);
 
-                    //Проверка данных (отправка пройденных данных) и составление данных для старого списка
                     var data1 = plc1.ShowLog(plc1.TryTakesData());
                     plc1.CheckUpdate(data1);
                     plc1.UpdatOldInfo(data1);

@@ -29,7 +29,7 @@ namespace LoggerDiagram
                 {
                     plc.Open();
                     plcaDatas = AddPlcData(19);
-                    //add();
+                    
                 }
             }
             catch (Exception ex)
@@ -43,14 +43,6 @@ namespace LoggerDiagram
             }
 
             return plcaDatas;
-        }
-        private void add()
-        {
-            if (plc.IsConnected != true)
-                plc.Open();
-
-            int f = (int)plc.Read(DataType.DataBlock, 1, 8, VarType.Int, 1);
-            int g = 10;
         }
 
         private List<PlcData> AddPlcData(int count) //+2
