@@ -96,19 +96,19 @@ namespace LoggerDiagram
 
         public List<PlcData> ShowLog(List<PlcData> plcaDatas)
         {
-            int coutOne = 0;
+            int coutMoreZero = 0;
             int counZero = 0;
             Console.WriteLine("################################################");
             foreach (var item in plcaDatas)
             {
                 Console.WriteLine($"Имя - {item.getNameRoom()}; Байт - {item.GetByte()}; Данные - {item.GetFloat()}; Time - {item.GetTime()}");
                 if (item.GetByte() > (byte)0)
-                    coutOne++;
+                    coutMoreZero++;
                 else
                     counZero++;
             }
 
-            Console.WriteLine($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutOne})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}/{Thread.CurrentThread.Name}");
+            Console.WriteLine($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutMoreZero})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}/{Thread.CurrentThread.Name}");
             Console.WriteLine("################################################");
             return plcaDatas;
         }
