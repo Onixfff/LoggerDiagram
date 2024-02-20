@@ -155,12 +155,13 @@ namespace LoggerDiagram
                         isSendMessage = dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
                         break;
                     case 22:
-                        isSendMessage =dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
+                        isSendMessage = dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
                         break;
                     default:
                         break;
                 }
             }
+            
             Console.WriteLine($"isSendMessage - {isSendMessage}");
         }
 

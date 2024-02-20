@@ -41,11 +41,12 @@ namespace LoggerDiagram.DB
 
                 bool isSendMessage = false;
                 var isState = _connection.State;
+                DateTime date = DateTime.Now;
+
                 if (isState == System.Data.ConnectionState.Closed)
                     _connection.Open();
                 try
                 {
-                    DateTime date = DateTime.Now;
                     var sqlDate = date.Date.ToString("yyyy-MM-dd HH:mm:ss");
                     string sql = $"INSERT INTO `diagramrooms`.`{room}` (`idgraph`, `nowTime`, `time` ,`value`) VALUES('{lastDiagramId}', '{sqlDate}', '{time}' , '{value.ToString().Replace(",",".")}');";
                     MySqlCommand cmd = new MySqlCommand(sql, _connection);
@@ -62,7 +63,7 @@ namespace LoggerDiagram.DB
                 {
                     _connection.Close();
                     if (isSendMessage)
-                        Console.WriteLine("Сообщение отправлено");
+                        Console.WriteLine($"Сообщение в комнату - {room} - отправлено" + date);
                     else
                         Console.WriteLine("Сообщение не доставлено");
                 }

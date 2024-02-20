@@ -25,8 +25,6 @@ namespace LoggerDiagram
                     plc1.CheckUpdate(data1);
                     plc1.UpdatOldInfo(data1);
 
-
-
                 }
                 catch (Exception ex)
                 {
