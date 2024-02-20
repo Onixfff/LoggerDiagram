@@ -17,7 +17,7 @@ namespace LoggerDiagram.DB
         private readonly string _connectionString = ConfigurationManager.ConnectionStrings["DB"].ConnectionString;
         MySqlConnection _connection;
 
-        public bool SendData(StatusByteEnum oldStatusByte,RoomNameEnum room, float value, int time)
+        public bool SendData(StatusByteEnum oldStatusByte, RoomNameEnum room, float value, int time)
         {
             int lastDiagramId = GetLastDiagramId(room);
             if(lastDiagramId < 0)
@@ -38,6 +38,7 @@ namespace LoggerDiagram.DB
                     default:
                         break;
                 }
+
                 bool isSendMessage = false;
                 var isState = _connection.State;
                 if (isState == System.Data.ConnectionState.Closed)
@@ -83,11 +84,11 @@ namespace LoggerDiagram.DB
                     string sql = $"SELECT idgraph FROM diagramrooms.{roomName} ORDER BY id DESC LIMIT 1";
                     MySqlCommand cmd = new MySqlCommand(sql, _connection);
                     MySqlDataReader reader = cmd.ExecuteReader();
+
                     while (reader.Read())
                     {
                         lastIndex = (int)reader[0];
                     }
-
                 }
                 catch (Exception ex)
                 {

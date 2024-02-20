@@ -19,7 +19,7 @@ namespace LoggerDiagram
             plc = new PlcConnection(ipEven).GetConnection();
         }
 
-        public List<PlcData> TryTakesData()
+        public List<PlcData> TryTakesData(bool isEven)
         {
             List<PlcData> plcaDatas = new List<PlcData>();
 
@@ -28,7 +28,7 @@ namespace LoggerDiagram
                 lock (plc)
                 {
                     plc.Open();
-                    plcaDatas = AddPlcData(19);
+                    plcaDatas = AddPlcData(19, isEven);
                     
                 }
             }
@@ -45,13 +45,19 @@ namespace LoggerDiagram
             return plcaDatas;
         }
 
-        private List<PlcData> AddPlcData(int count) //+2
+        private List<PlcData> AddPlcData(int count, bool isEven) //+2
         {
-            RoomNameEnum roomNameEnum = 0;
+            RoomNameEnum roomNameEnum;
+            if (isEven)
+                roomNameEnum = 0;
+            else
+                roomNameEnum = (RoomNameEnum)1;
+
             List<PlcData> plcaDatas = new List<PlcData>();
             int byteCount = 0;
             int doubleCount = 2;
             int timeCount = 6;
+
             try
             {
                 if (plc.IsConnected != true)
@@ -73,7 +79,7 @@ namespace LoggerDiagram
                     byteCount += 8;
                     doubleCount += 8;
                     timeCount += 8;
-                    roomNameEnum++;
+                    roomNameEnum += 2;
                 }
             }
             catch (PlcException ex)

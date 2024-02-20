@@ -37,6 +37,14 @@ namespace LoggerDiagram
         graph27,
         graph28,
         graph29,
-        graph30
+        graph30,
+        graph31,
+        graph32,
+        graph33,
+        graph34,
+        graph35,
+        graph36,
+        graph37,
+        graph38,
     }
 }
