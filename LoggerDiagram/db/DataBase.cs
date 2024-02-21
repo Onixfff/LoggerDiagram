@@ -1,6 +1,7 @@
 ﻿using LoggerDiagram.Plc;
 using MySql.Data.MySqlClient;
 using Mysqlx.Session;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,6 +17,7 @@ namespace LoggerDiagram.DB
 
         private readonly string _connectionString = ConfigurationManager.ConnectionStrings["DB"].ConnectionString;
         MySqlConnection _connection;
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
         public bool SendData(StatusByteEnum oldStatusByte, RoomNameEnum room, float value, int time)
         {
@@ -54,9 +56,10 @@ namespace LoggerDiagram.DB
                     cmd.ExecuteNonQuery();
                     isSendMessage = true;
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                    logger.Error(ex.Message + "Строка -" + ex.StackTrace);
+                    Console.WriteLine(ex.Message + "\n" + ex.StackTrace);
                     isSendMessage = false;
                 }
                 finally
@@ -93,6 +96,7 @@ namespace LoggerDiagram.DB
                 }
                 catch (Exception ex)
                 {
+                    logger.Error(ex.Message + "Строка -" + ex.StackTrace);
                     Console.WriteLine(ex.Message + "\n" + ex.Data);
                 }
                 finally { _connection.Close(); }
