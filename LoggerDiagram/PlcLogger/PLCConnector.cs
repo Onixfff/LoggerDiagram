@@ -1,5 +1,6 @@
 ﻿using LoggerDiagram.DB;
 using LoggerDiagram.Plc;
+using NLog;
 using S7.Net;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace LoggerDiagram
 {
     internal class PlcConnector
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
         private S7.Net.Plc plc;
         private List<OldPlcData> oldPlcDatas = new List<OldPlcData>();
         private List<byte> bytes = new List<byte>();
