@@ -4,22 +4,22 @@ namespace LoggerDiagram
 {
     public class PlcData
     {
-        private RoomNameEnum RoomName;
-        private Byte BytePlc;
-        private float DoublePlc;
-        private int Time;
+        private RoomNameEnum _roomName;
+        private Byte _bytePlc;
+        private float _doublePlc;
+        private int _time;
 
         public PlcData(RoomNameEnum roomName, Byte bytePlc, float doublePlc, int time)
         {
-            RoomName = roomName;
-            BytePlc = bytePlc;
-            DoublePlc = doublePlc;
-            Time = time;
+            _roomName = roomName;
+            _bytePlc = bytePlc;
+            _doublePlc = doublePlc;
+            _time = time;
         }
 
         public bool GetIsNewDiagramId()
         {
-            if ((int)BytePlc > 0)
+            if ((int)_bytePlc > 0)
                 return true;
             else
                 return false;
@@ -28,22 +28,22 @@ namespace LoggerDiagram
 
         public Byte GetByte()
         {
-            return BytePlc;
+            return _bytePlc;
         }
 
         public float GetFloat()
         {
-            return DoublePlc;
+            return _doublePlc;
         }
 
         public RoomNameEnum getNameRoom()
         {
-            return RoomName;
+            return _roomName;
         }
 
         public int GetTime()
         {
-            return Time;
+            return _time;
         }
 
     }
