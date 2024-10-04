@@ -12,6 +12,7 @@ namespace LoggerDiagram
     internal class PlcConnector
     {
         private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+        
         private S7.Net.Plc plc;
         private List<OldPlcData> oldPlcDatas = new List<OldPlcData>();
         private List<byte> bytes = new List<byte>();
@@ -41,6 +42,7 @@ namespace LoggerDiagram
             try
             {
                 plcaDatas = await AddPlcData(countRoom, isEven);
+
                 if(isEven)
                     logger.Trace($"Снял данные из 103 ip; Кол-во запросов {countRoom}");
                 else
@@ -50,10 +52,14 @@ namespace LoggerDiagram
             {
                 //TODO Создать текстовый документ который будет говорить мне что случилось.
                 Console.WriteLine(ex.Message + "\n" + ex.Data);
+
                 if(isEven)
                     logger.Error($"Ошибка получения данных из 103 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
                 else
                     logger.Error($"Ошибка получения данных из 104 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
+
+                throw new Exception("Ошибка подключения", ex);
+
             }
             finally
             {
@@ -66,6 +72,7 @@ namespace LoggerDiagram
         private async Task<List<PlcData>> AddPlcData(int count, bool isEven) //+2
         {
             RoomNameEnum roomNameEnum;
+
             if (isEven)
                 roomNameEnum = 0;
             else
@@ -103,6 +110,7 @@ namespace LoggerDiagram
             catch (PlcException ex)
             {
                 Console.WriteLine(ex.Message + "\n" + ex.TargetSite);
+
                 if(isEven)
                     logger.Error($"Ошибка получения данных из 103 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
                 else
@@ -120,17 +128,21 @@ namespace LoggerDiagram
         {
             int coutMoreZero = 0;
             int counZero = 0;
+            
             Console.WriteLine("################################################");
+            
             foreach (var item in plcaDatas)
             {
-                logger.Debug($"Имя - {item.getNameRoom()}; Байт - {item.GetByte()}; Данные - {item.GetFloat()}; Time - {item.GetTime()}");
+                logger.Trace($"Имя - {item.getNameRoom()}; Байт - {item.GetByte()}; Данные - {item.GetFloat()}; Time - {item.GetTime()}");
                 Console.WriteLine($"Имя - {item.getNameRoom()}; Байт - {item.GetByte()}; Данные - {item.GetFloat()}; Time - {item.GetTime()}");
+                
                 if (item.GetByte() > (byte)0)
                     coutMoreZero++;
                 else
                     counZero++;
             }
-            logger.Debug($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutMoreZero})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}/{Thread.CurrentThread.Name}");
+            
+            logger.Trace($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutMoreZero})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}/{Thread.CurrentThread.Name}");
             Console.WriteLine($"Ip - {plc.IP}\nСчётчик равный = 1 ({coutMoreZero})\nСчетчик равный = 0 ({counZero})\nПоток - {Environment.CurrentManagedThreadId}/{Thread.CurrentThread.Name}");
             Console.WriteLine("################################################");
             return plcaDatas;
@@ -176,11 +188,11 @@ namespace LoggerDiagram
                         break;
                     case 1:
                         isSendMessage = dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
-                        logger.Debug($"Отправка в комнату {item.getNameRoom()} - завершилась ({isSendMessage})");
+                        logger.Trace($"Отправка в комнату {item.getNameRoom()} - завершилась ({isSendMessage})");
                         break;
                     case 22:
                         isSendMessage = dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
-                        logger.Debug($"Отправка в комнату {item.getNameRoom()} - завершилась ({isSendMessage})");
+                        logger.Trace($"Отправка в комнату {item.getNameRoom()} - завершилась ({isSendMessage})");
                         break;
                     default:
                         break;
@@ -192,6 +204,7 @@ namespace LoggerDiagram
         private StatusByteEnum GetOldStatusByteEnum(RoomNameEnum room)
         {
             StatusByteEnum statusByte = StatusByteEnum.Error;
+
             foreach (var item in oldPlcDatas)
             {
                 if(item.GetRoomName() == room)
@@ -199,6 +212,7 @@ namespace LoggerDiagram
                     return statusByte = item.GetStatusByte();
                 }
             }
+
             return statusByte;
         }
     }
