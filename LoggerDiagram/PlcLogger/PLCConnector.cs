@@ -30,7 +30,16 @@ namespace LoggerDiagram
 
             try
             {
-                plc.Open();
+                plc.OpenAsync();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Ошибка открытия порта \n" + ex);
+                throw new Exception("Ошибка подключения", ex);
+            }
+
+            try
+            {
                 plcaDatas = AddPlcData(countRoom, isEven);
                 if(isEven)
                     logger.Debug($"Снял данные из 103 ip; Кол-во запросов {countRoom}");
@@ -164,7 +173,6 @@ namespace LoggerDiagram
                 switch (item.GetByte())
                 {
                     case 0:
-
                         break;
                     case 1:
                         isSendMessage = dataBase.SendData(GetOldStatusByteEnum(item.getNameRoom()), item.getNameRoom(), item.GetFloat(), item.GetTime());
