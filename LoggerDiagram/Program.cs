@@ -8,7 +8,7 @@ namespace LoggerDiagram
     {
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        static void Main(string[] args)
+        static async void Main(string[] args)
         {
             PlcConnector plc1 = new PlcConnector(ConfigurationManager.AppSettings["PlcEven"]);
             PlcConnector plc2 = new PlcConnector(ConfigurationManager.AppSettings["PlcOdd"]);
@@ -18,13 +18,13 @@ namespace LoggerDiagram
                 {  
                     //Получение данных с PLC
                     
-                    var data2 = plc2.ShowLog(plc2.TryTakesData(true));
+                    var data2 = plc2.ShowLog(await plc2.TryTakesData(true));
                     plc2.CheckUpdate(data2);
                     plc2.UpdatOldInfo(data2);
 
                     logger.Debug("PlcOdd завершил выполнение кода\n\n");
 
-                    var data1 = plc1.ShowLog(plc1.TryTakesData(false));
+                    var data1 = plc1.ShowLog(await plc1.TryTakesData(false));
                     plc1.CheckUpdate(data1);
                     plc1.UpdatOldInfo(data1);
 

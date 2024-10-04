@@ -5,6 +5,7 @@ using S7.Net;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace LoggerDiagram
 {
@@ -20,7 +21,7 @@ namespace LoggerDiagram
             plc = new PlcConnection(ipEven).GetConnection();
         }
 
-        public List<PlcData> TryTakesData(bool isEven)
+        public async Task<List<PlcData>> TryTakesData(bool isEven)
         {
             List<PlcData> plcaDatas = new List<PlcData>();
 
@@ -28,30 +29,31 @@ namespace LoggerDiagram
 
             try
             {
-                plc.OpenAsync();
+                await plc.OpenAsync();
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Ошибка открытия порта \n" + ex);
+                logger.Error("Ошибка открытия порта \n" + ex);
                 throw new Exception("Ошибка подключения", ex);
             }
+            finally { plc.Close(); }
 
             try
             {
-                plcaDatas = AddPlcData(countRoom, isEven);
+                plcaDatas = await AddPlcData(countRoom, isEven);
                 if(isEven)
-                    logger.Debug($"Снял данные из 103 ip; Кол-во запросов {countRoom}");
+                    logger.Trace($"Снял данные из 103 ip; Кол-во запросов {countRoom}");
                 else
-                    logger.Debug($"Снял данные из 104 ip; Кол-во запросов {countRoom}");
+                    logger.Trace($"Снял данные из 104 ip; Кол-во запросов {countRoom}");
             }
             catch (Exception ex)
             {
                 //TODO Создать текстовый документ который будет говорить мне что случилось.
                 Console.WriteLine(ex.Message + "\n" + ex.Data);
                 if(isEven)
-                    logger.Debug($"Ошибка получения данных из 103 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
+                    logger.Error($"Ошибка получения данных из 103 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
                 else
-                    logger.Debug($"Ошибка получения данных из 104 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
+                    logger.Error($"Ошибка получения данных из 104 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
             }
             finally
             {
@@ -61,7 +63,7 @@ namespace LoggerDiagram
             return plcaDatas;
         }
 
-        private List<PlcData> AddPlcData(int count, bool isEven) //+2
+        private async Task<List<PlcData>> AddPlcData(int count, bool isEven) //+2
         {
             RoomNameEnum roomNameEnum;
             if (isEven)
@@ -77,7 +79,7 @@ namespace LoggerDiagram
             try
             {
                 if (plc.IsConnected != true)
-                    plc.Open();
+                    await plc.OpenAsync();
 
                 for (int i = 0; i < count; i++)
                 {
@@ -102,9 +104,9 @@ namespace LoggerDiagram
             {
                 Console.WriteLine(ex.Message + "\n" + ex.TargetSite);
                 if(isEven)
-                    logger.Debug($"Ошибка получения данных из 103 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
+                    logger.Error($"Ошибка получения данных из 103 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
                 else
-                    logger.Debug($"Ошибка получения данных из 104 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
+                    logger.Error($"Ошибка получения данных из 104 ip;{ex.Message}\n{ex.StackTrace}\n{ex.Data}");
             }
             finally
             {
