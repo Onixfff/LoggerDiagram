@@ -10,7 +10,7 @@ namespace LoggerDiagram
         {
             _ip = ip;
         }
-
+        
         public S7.Net.Plc GetConnection() //ConfigurationManager.AppSettings["PlcEven"]
         {
             S7.Net.Plc plc = new S7.Net.Plc(CpuType.S71200, _ip ,0,1);
