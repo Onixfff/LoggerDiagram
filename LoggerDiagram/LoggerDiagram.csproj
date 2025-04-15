@@ -122,6 +122,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DB\DataBase.cs" />
+    <Compile Include="Models\DataPoints.cs" />
+    <Compile Include="Models\Graph.cs" />
     <Compile Include="PlcLogger\OldPlcData.cs" />
     <Compile Include="PlcLogger\PlcConnection.cs" />
     <Compile Include="PlcLogger\PlcConnector.cs" />
