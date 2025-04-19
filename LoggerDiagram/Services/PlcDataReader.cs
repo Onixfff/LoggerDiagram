@@ -86,7 +86,18 @@ namespace LoggerDiagram.Services
             }
             finally
             {
-                _plc.Close();
+                try
+                {
+                    if (_plc.IsConnected)
+                    {
+                        _plc.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Warn(ex, "Ошибка при закрытии соединения с PLC.");
+                }
+
             }
         }
     }
