@@ -22,7 +22,7 @@ namespace LoggerDiagram.Models
             int maxGraphId = 38;
 
             //Проверка данных
-            if(batchNumber < 0 && batchNumber > maxGraphId)
+            if(batchNumber < 0 && batchNumber < maxGraphId)
             {
                 throw new ArgumentOutOfRangeException("Номер партии вышел за допустимый диапозон");
             }
