@@ -23,18 +23,18 @@ namespace LoggerDiagram
             {
                 try
                 {
+                    var data1 = plc1.ShowLog(await plc1.TryTakesData(false));
+                    plc1.CheckUpdate(data1);
+                    plc1.UpdatOldInfo(data1);
+
+                    logger.Trace("PlcEven завершил выполнение кода\n\n");
+
                     //Получение данных с PLC
                     var data2 = plc2.ShowLog(await plc2.TryTakesData(true));
                     plc2.CheckUpdate(data2);
                     plc2.UpdatOldInfo(data2);
 
                     logger.Trace("PlcOdd завершил выполнение кода\n\n");
-
-                    var data1 = plc1.ShowLog(await plc1.TryTakesData(false));
-                    plc1.CheckUpdate(data1);
-                    plc1.UpdatOldInfo(data1);
-
-                    logger.Trace("PlcEven завершил выполнение кода\n\n");
 
                 }
                 catch (Exception ex)

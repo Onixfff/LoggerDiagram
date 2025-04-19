@@ -19,7 +19,7 @@ namespace LoggerDiagram.Models
 
         public static DataPoints Create(int batchNumber, DateTime nowTime, float value, int time)
         {
-            int maxGraphId = 30;
+            int maxGraphId = 38;
 
             //Проверка данных
             if(batchNumber < 0 && batchNumber > maxGraphId)
