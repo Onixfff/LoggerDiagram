@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Autofac;
+using LoggerDiagram.DependencyInjection;
+using System;
 using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,12 +9,15 @@ namespace LoggerDiagram
 {
     internal class Program
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
         public static void Main(string[] args)
         {
-            Task.Run(async () => await RunAsync()).GetAwaiter().GetResult();
+            ContainerConfig containerConfig = new ContainerConfig();
+            IContainer container = containerConfig.Configure();
         }
+
+
+        Task.Run(async () => await RunAsync()).GetAwaiter().GetResult();
+
 
         private static async Task RunAsync()
         {

@@ -9,13 +9,13 @@ namespace LoggerDiagram.Services
 {
     internal class PlcDataReader : IPlcDataReader
     {
-        private S7.Net.Plc _plc;
+        private Plc _plc;
         private readonly ILogger _logger;
 
         public PlcDataReader(string ip, ILogger logger)
         {
             _logger = logger;
-            _plc = new S7.Net.Plc(CpuType.S71200, ip, 0, 1);
+            _plc = new Plc(CpuType.S71200, ip, 0, 1);
         }
 
         public async Task<PlcLogEntry> GetDataAsync(int byteStart, int doubleStart, int timeStart, CancellationToken token)
