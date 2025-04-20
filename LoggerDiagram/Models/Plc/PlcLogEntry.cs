@@ -2,7 +2,7 @@
 
 namespace LoggerDiagram.Models.Plc
 {
-    internal class PlcLogEntry
+    public class PlcLogEntry
     {
         public readonly Byte RawByteValue;
         public readonly double Value;

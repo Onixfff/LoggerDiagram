@@ -129,6 +129,8 @@
     <Compile Include="DataAccess\IDataBaseRepository.cs" />
     <Compile Include="DependencyInjection\ContainerConfig.cs" />
     <Compile Include="DTO\PlcLogEntryDto.cs" />
+    <Compile Include="Factory\IPlcDataReaderFactory.cs" />
+    <Compile Include="Factory\PlcDataReaderFactory.cs" />
     <Compile Include="Models\Data\DataPoints.cs" />
     <Compile Include="Models\Data\Graph.cs" />
     <Compile Include="Models\Plc\PlcLogEntry.cs" />
