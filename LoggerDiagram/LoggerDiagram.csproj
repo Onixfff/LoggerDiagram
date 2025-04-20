@@ -124,6 +124,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAccess\DataBaseServices.cs" />
+    <Compile Include="DataAccess\IDataBaseServices.cs" />
     <Compile Include="DB\DataBase.cs" />
     <Compile Include="DependencyInjection\ContainerConfig.cs" />
     <Compile Include="Models\Data\DataPoints.cs" />
