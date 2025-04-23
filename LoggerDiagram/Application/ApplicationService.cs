@@ -1,5 +1,6 @@
 ﻿using LoggerDiagram.DataAccess;
 using LoggerDiagram.DTO;
+using LoggerDiagram.Enums;
 using LoggerDiagram.Models.Plc;
 using LoggerDiagram.Services;
 using NLog;
@@ -48,8 +49,6 @@ namespace LoggerDiagram.Application
                     List<PlcLogEntryDto> result1 = results[0];
                     List<PlcLogEntryDto> result2 = results[1];
                     
-                    //TODO Перебор данных до отправки (если 0 или 1 в байтах) нужно добавить логику возможно её стоит добавить в модель при создании чтобы он сам увеличивал значение на 1 в batchNunber
-
                     //Отправка данных
                     for (int i = 0; i < MaxIndex/2; i++)
                     {
@@ -89,7 +88,7 @@ namespace LoggerDiagram.Application
             for(int i = startI; i < maxI/2; i+=2)
             {
                 plcLogEntitys.Add(await plcDataReader.GetDataAsync(byteCount, doubleCount, timeCount, token));
-                plcLogEntryDtos.Add(ConvertPlcLogEntityInDto(i, plcLogEntitys[i]));
+                plcLogEntryDtos.Add(await ConvertPlcLogEntityInDtoAsync(i, plcLogEntitys[i], token));
 
                 byteCount += 8;
                 doubleCount += 8;
@@ -99,9 +98,40 @@ namespace LoggerDiagram.Application
             return plcLogEntryDtos;
         }
 
-        private PlcLogEntryDto ConvertPlcLogEntityInDto(int id, PlcLogEntry plcLogEntry)
+        private async Task<PlcLogEntryDto> ConvertPlcLogEntityInDtoAsync(int id, PlcLogEntry plcLogEntry, CancellationToken token)
         {
-            return PlcLogEntryDto.Create(id, plcLogEntry.Value, plcLogEntry.Time);
+            int lastBatchNumber = await _dataBaseRepository.GetLastBatchNumberByGraphAsync(id, token);
+
+            lastBatchNumber = ChangeBatchNumber(lastBatchNumber, plcLogEntry);
+
+            return PlcLogEntryDto.Create(id, lastBatchNumber, plcLogEntry.RawByteValue, plcLogEntry.Value, plcLogEntry.Time);
+        }
+
+        private int ChangeBatchNumber(int lastBatchNumber, PlcLogEntry plcLogEntryDtos)
+        {
+            RawByteValueEnum status;
+
+            switch (plcLogEntryDtos.RawByteValue)
+            {
+                case 0:
+                    status = RawByteValueEnum.SameProduct;
+                    break;
+                case 1:
+                    status = RawByteValueEnum.NewProduct;
+                    break;
+                case 100:
+                    status = RawByteValueEnum.Error;
+                    throw new InvalidOperationException($"Ошибка {nameof(plcLogEntryDtos.RawByteValue)}: {plcLogEntryDtos.RawByteValue} получил значение ошибки");
+                default:
+                    throw new InvalidOperationException($"Недопустимое значение rawByteValue: {plcLogEntryDtos.RawByteValue}");
+            }
+
+            if(status == RawByteValueEnum.SameProduct)
+            {
+                lastBatchNumber++;
+            }
+
+            return lastBatchNumber;
         }
     }
 }

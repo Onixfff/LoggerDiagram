@@ -7,5 +7,7 @@ namespace LoggerDiagram.DataAccess
     internal interface IDataBaseRepository
     {
         Task SendDataAsync(PlcLogEntryDto plcLogEntryDto, CancellationToken token);
+
+        Task<int> GetLastBatchNumberByGraphAsync(int idGraph, CancellationToken token);
     }
 }

@@ -31,7 +31,7 @@ namespace LoggerDiagram.DataAccess
             {
                 token.ThrowIfCancellationRequested();
                 // Получаем максимальный номер пакета для указанного IdGraph
-                lastBatchNumber = await GetLastBatchNumberAsync(plcLogEntryDto.IdGraph, token);
+                lastBatchNumber = await GetLastBatchNumberByGraphAsync(plcLogEntryDto.IdGraph, token);
 
                 // Логика отправки данных
 
@@ -80,7 +80,7 @@ namespace LoggerDiagram.DataAccess
             }
         }
 
-        private async Task<int> GetLastBatchNumberAsync(int idGraph, CancellationToken token)
+        public async Task<int> GetLastBatchNumberByGraphAsync(int idGraph, CancellationToken token)
         {
             string sql = @"
                 SELECT MAX(d.BatchNumber) AS MaxBatchNumber
