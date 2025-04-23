@@ -4,12 +4,13 @@ using LoggerDiagram.DependencyInjection;
 using NLog;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace LoggerDiagram
 {
     internal class Program
     {
-        public static async void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             ContainerConfig containerConfig = new ContainerConfig();
             IContainer container = containerConfig.Configure();
