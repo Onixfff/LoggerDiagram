@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace LoggerDiagram.DataAccess
 {
-    internal interface IDataBaseRepository
+    public interface IDataBaseRepository
     {
         Task SendDataAsync(PlcLogEntryDto plcLogEntryDto, CancellationToken token);
 

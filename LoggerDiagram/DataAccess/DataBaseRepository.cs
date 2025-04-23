@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LoggerDiagram.DataAccess
 {
-    internal class DataBaseRepository : IDataBaseRepository
+    public class DataBaseRepository : IDataBaseRepository
     {
         private readonly string _connectionString;
         private readonly ILogger _logger;

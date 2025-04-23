@@ -3,7 +3,7 @@ using System;
 
 namespace LoggerDiagram.DTO
 {
-    internal class PlcLogEntryDto
+    public class PlcLogEntryDto
     {
         public readonly int IdGraph;
         public readonly int BatchNumber;
