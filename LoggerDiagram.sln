@@ -5,6 +5,11 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerDiagram", "LoggerDiagram\LoggerDiagram.csproj", "{7245C009-68A8-480A-883B-21AE64A274ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerDiagram.Test", "LoggerDiagram.Test\LoggerDiagram.Test.csproj", "{4D9CA7F5-FA51-43FF-A21F-788661198F52}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7245C009-68A8-480A-883B-21AE64A274ED} = {7245C009-68A8-480A-883B-21AE64A274ED}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +20,10 @@ Global
 		{7245C009-68A8-480A-883B-21AE64A274ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7245C009-68A8-480A-883B-21AE64A274ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7245C009-68A8-480A-883B-21AE64A274ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D9CA7F5-FA51-43FF-A21F-788661198F52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D9CA7F5-FA51-43FF-A21F-788661198F52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D9CA7F5-FA51-43FF-A21F-788661198F52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D9CA7F5-FA51-43FF-A21F-788661198F52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
