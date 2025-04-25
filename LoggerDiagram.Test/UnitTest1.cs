@@ -18,9 +18,18 @@ namespace LoggerDiagram.Test
             int itemId = 1;
             var connectionString = "Database=diagramrooms; Server=localhost; port=3306; username=root; password=12345; charset=utf8";
             var moqLogger = new Mock<ILogger>();
+            var moqDB = new Mock<IDataBaseRepository>();
+            var moqToken = new Mock<CancellationTokenSource>();
+
+
 
             moqLogger.Setup(logger => logger.Info(It.IsAny<string>()))
                 .Callback<string>(message => Console.WriteLine($"Лог: {message}"));
+
+            moqToken.Setup(token => token.Token)
+                .Callback<string>(message => Console.WriteLine(message));
+
+            moqDB.Setup(db => db.GetLastBatchNumberByGraphAsync(It.IsAny<int>, moqToken.Object.Token));
 
             DataBaseRepository dataBaseServices = new DataBaseRepository(connectionString, moqLogger.Object);
 

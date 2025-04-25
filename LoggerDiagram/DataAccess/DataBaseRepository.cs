@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using NLog;
 using System;
+using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -59,6 +60,10 @@ namespace LoggerDiagram.DataAccess
             {
                 _logger.Error(ex, "Ошибка со стороны базы данных");
                 throw;
+            }
+            catch(DbException ex)
+            {
+                _logger.Error(ex, "Непредвиденная ошибка с базой данных");
             }
             catch (Exception ex)
             {
@@ -121,7 +126,11 @@ namespace LoggerDiagram.DataAccess
                 _logger.Error(ex, "Ошибка со стороны базы данных");
                 throw;
             }
-            catch(Exception ex)
+            catch (DbException ex)
+            {
+                _logger.Error(ex, "Непредвиденная ошибка с базой данных");
+            }
+            catch (Exception ex)
             {
                 _logger.Error(ex, "Непредвиденная ошибка");
                 throw;
