@@ -25,16 +25,8 @@ namespace LoggerDiagram.DataAccess
             (`IdGraph`, `BatchNumber`, `NowTime`, `Value`, `Time`) 
             VALUES (@IdGraph, @BatchNumber, @NowTime, @Value, @Time);
         ";
-            int lastBatchNumber;
-
             try
             {
-                token.ThrowIfCancellationRequested();
-                // Получаем максимальный номер пакета для указанного IdGraph
-                lastBatchNumber = await GetLastBatchNumberByGraphAsync(plcLogEntryDto.IdGraph, token);
-
-                // Логика отправки данных
-
                 using(var connection = new MySqlConnection(_connectionString))
                 {
                     token.ThrowIfCancellationRequested();
@@ -45,7 +37,7 @@ namespace LoggerDiagram.DataAccess
                     {
                         //Добавляем параметры
                         command.Parameters.AddWithValue("@IdGraph", plcLogEntryDto.IdGraph);
-                        command.Parameters.AddWithValue("@BatchNumber", lastBatchNumber);
+                        command.Parameters.AddWithValue("@BatchNumber", plcLogEntryDto.BatchNumber);
                         command.Parameters.AddWithValue("@NowTime", DateTime.Now);
                         command.Parameters.AddWithValue("@Value", plcLogEntryDto.Value);
                         command.Parameters.AddWithValue("@Time", plcLogEntryDto.Time);
@@ -57,11 +49,6 @@ namespace LoggerDiagram.DataAccess
                     }
                 }
 
-            }
-            catch (InvalidCastException ex)
-            {
-                _logger.Error(ex, $"{nameof(lastBatchNumber)} вернул ошибку");
-                throw;
             }
             catch (OperationCanceledException)
             {
