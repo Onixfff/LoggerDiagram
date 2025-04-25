@@ -64,6 +64,7 @@ namespace LoggerDiagram.DataAccess
             catch(DbException ex)
             {
                 _logger.Error(ex, "Непредвиденная ошибка с базой данных");
+                throw;
             }
             catch (Exception ex)
             {
@@ -129,6 +130,7 @@ namespace LoggerDiagram.DataAccess
             catch (DbException ex)
             {
                 _logger.Error(ex, "Непредвиденная ошибка с базой данных");
+                throw;
             }
             catch (Exception ex)
             {
