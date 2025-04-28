@@ -109,7 +109,6 @@ namespace LoggerDiagram.DataAccess
                         {
                             _logger.Error($"Неверное преобразование MaxBatchNumber из БД. Значение: {result}");
                             throw new InvalidCastException("Неверный тип данных для MaxBatchNumber");
-
                         }
 
                         _logger.Info($"Запрос выполнен успешно. MaxBatchNumber = {maxBatchNumber}");
@@ -125,11 +124,6 @@ namespace LoggerDiagram.DataAccess
             catch (MySqlException ex)   
             {
                 _logger.Error(ex, "Ошибка со стороны базы данных");
-                throw;
-            }
-            catch (DbException ex)
-            {
-                _logger.Error(ex, "Непредвиденная ошибка с базой данных");
                 throw;
             }
             catch (Exception ex)
