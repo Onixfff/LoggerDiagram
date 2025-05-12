@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using LoggerDiagram.Application;
 using LoggerDiagram.DataAccess;
 using NLog;
 using System.Configuration;
@@ -24,8 +25,11 @@ namespace LoggerDiagram.DependencyInjection
             builder.Register(c => LogManager.GetCurrentClassLogger())
                 .As<ILogger>();
 
-            builder.RegisterType<IPlcDataReaderFactory>()
+            builder.RegisterType<PlcDataReaderFactory>()
                 .As<IPlcDataReaderFactory>();
+
+            builder.RegisterType<ApplicationService>()
+                .AsSelf();
 
             return builder.Build();
         }

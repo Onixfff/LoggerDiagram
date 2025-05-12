@@ -6,6 +6,7 @@ using LoggerDiagram.Services;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,10 +31,27 @@ namespace LoggerDiagram.Application
 
         public async Task RunAsync(CancellationToken token)
         {
-            IPlcDataReader plcDataReader1 = _plcDataReaderFactory.Create("");
-            IPlcDataReader plcDataReader2 = _plcDataReaderFactory.Create("");
+            string ip1 = ConfigurationManager.AppSettings["PlcEven"];
+            string ip2 = ConfigurationManager.AppSettings["PlcOdd"];
 
-            while (token.IsCancellationRequested)
+            if (string.IsNullOrWhiteSpace(ip1))
+            {
+                string error = "Ошибка isNull " + nameof(ip1);
+                _logger.Error(error);
+                throw new ArgumentNullException(nameof(ip1));
+            }
+
+            if (string.IsNullOrWhiteSpace(ip2))
+            {
+                string error = "Ошибка isNull " + nameof(ip2);
+                _logger.Error(error);
+                throw new ArgumentNullException(nameof(ip2));
+            }
+
+            IPlcDataReader plcDataReader1 = _plcDataReaderFactory.Create(ip1);
+            IPlcDataReader plcDataReader2 = _plcDataReaderFactory.Create(ip2);
+
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
