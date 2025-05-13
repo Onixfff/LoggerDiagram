@@ -66,7 +66,7 @@ namespace LoggerDiagram.DependencyInjection
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<InMemoryGraphStateManager>()
-                .As<InMemoryGraphStateManager>()
+                .As<IGraphStateManager>()
                 .SingleInstance();
 
             return builder.Build();
