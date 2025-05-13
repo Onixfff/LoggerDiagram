@@ -47,10 +47,10 @@ namespace LoggerDiagram.DTO
             switch (rawByteValue)
             {
                 case 0:
-                    status = RawByteValueEnum.SameProduct;
+                    status = RawByteValueEnum.ZeroProduct;
                     break;
                 case 1:
-                    status = RawByteValueEnum.NewProduct;
+                    status = RawByteValueEnum.IsHaveProduct;
                     break;
                 case 100:
                     status = RawByteValueEnum.Error;

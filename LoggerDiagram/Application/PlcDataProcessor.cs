@@ -34,24 +34,19 @@ namespace LoggerDiagram.Application
         public async Task ProcessAsync(CancellationToken token)
         {
             string ipEven = ConfigurationManager.AppSettings["PlcEven"];
-            string ipOdd = ConfigurationManager.AppSettings["PlcOdd"];
 
-            ValidateIps(ipEven, ipOdd);
+            ValidateIps(ipEven);
 
             var allIds = await GetAllGraphIdsAsync(token);
             var (evenIds, oddIds) = _splitter.Split(allIds);
 
             await ProcessGroupAsync(evenIds, ipEven, token);
-            await ProcessGroupAsync(oddIds, ipOdd, token);
         }
 
-        private void ValidateIps(string ipEven, string ipOdd)
+        private void ValidateIps(string ipEven)
         {
             if (string.IsNullOrWhiteSpace(ipEven))
                 throw new ArgumentNullException(nameof(ipEven), "IP для чётных PLC не задан");
-
-            if (string.IsNullOrWhiteSpace(ipOdd))
-                throw new ArgumentNullException(nameof(ipOdd), "IP для нечётных PLC не задан");
         }
 
         private async Task<List<int>> GetAllGraphIdsAsync(CancellationToken token)
@@ -69,6 +64,10 @@ namespace LoggerDiagram.Application
             IPlcDataReader reader = _readerFactory.Create(ip);
             var data = await _readerService.ReadPlcLogsAsync(ids, reader, token);
             var dtos = await _converter.ConvertAsync(ids, data, token);
+            
+            if (dtos == null)
+                return;
+
             await _sender.SendAsync(dtos, token);
         }
 

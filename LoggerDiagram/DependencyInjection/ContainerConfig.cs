@@ -65,6 +65,10 @@ namespace LoggerDiagram.DependencyInjection
                 .As<IBatchNumberAdjuster>()
                 .InstancePerLifetimeScope();
 
+            builder.RegisterType<InMemoryGraphStateManager>()
+                .As<InMemoryGraphStateManager>()
+                .SingleInstance();
+
             return builder.Build();
         }
     }

@@ -19,9 +19,9 @@ namespace LoggerDiagram.Services
             _batchAdjuster = batchAdjuster;
         }
 
-        public async Task<List<PlcLogEntityDto>> ConvertAsync(List<int> ids, List<PlcLogEntity> entities, CancellationToken token)
+        public async Task<List<PlcLogEntityDto>> ConvertAsync(List<int> ids, List<PlcLogEntity> entity, CancellationToken token)
         {
-            if (ids.Count != entities.Count)
+            if (ids.Count != entity.Count)
                 throw new ArgumentException("Кол-во id и данных не совпадает");
 
             var dtos = new List<PlcLogEntityDto>();
@@ -29,9 +29,14 @@ namespace LoggerDiagram.Services
             for(int i = 0; i < ids.Count; i++)
             {
                 int batch = await _repository.GetLastBatchNumberByGraphAsync(ids[i], token);
-                batch = _batchAdjuster.Adjust(batch, entities[i]);
+                batch = _batchAdjuster.Adjust(ids[i], batch, entity[i]);
 
-                dtos.Add(PlcLogEntityDto.Create(ids[i], batch, entities[i].RawByteValue, entities[i].Value, entities[i].Time));
+                if (entity[i].RawByteValue == 0)
+                {
+                    return null; // Не отправляем данные
+                }
+
+                dtos.Add(PlcLogEntityDto.Create(ids[i], batch, entity[i].RawByteValue, entity[i].Value, entity[i].Time));
             }
 
             return dtos;

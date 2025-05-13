@@ -2,8 +2,8 @@
 {
     public enum RawByteValueEnum
     {
-        SameProduct = 0,
-        NewProduct = 1,
+        ZeroProduct = 0,
+        IsHaveProduct = 1,
         Error = 100
     }
 }
