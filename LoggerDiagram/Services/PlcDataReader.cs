@@ -18,9 +18,9 @@ namespace LoggerDiagram.Services
             _plc = new Plc(CpuType.S71200, ip, 0, 1);
         }
 
-        public async Task<PlcLogEntry> GetDataAsync(int byteStart, int doubleStart, int timeStart, CancellationToken token)
+        public async Task<PlcLogEntity> GetDataAsync(int byteStart, int doubleStart, int timeStart, CancellationToken token)
         {
-            PlcLogEntry plcLogEntry;
+            PlcLogEntity plcLogEntry;
 
             try
             {
@@ -64,7 +64,7 @@ namespace LoggerDiagram.Services
 
                 _logger.Info($"Успешно прочитано значение {intValue} по адресу {timeStart}.");
 
-                plcLogEntry = PlcLogEntry.Create(byteValue, doubleValue, intValue);
+                plcLogEntry = PlcLogEntity.Create(byteValue, doubleValue, intValue);
                 _logger.Info($"Успешное создание PlcLogEntry");
 
                 return plcLogEntry;

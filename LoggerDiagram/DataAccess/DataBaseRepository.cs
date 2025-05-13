@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +20,7 @@ namespace LoggerDiagram.DataAccess
             _logger = logger;
         }
 
-        public async Task SendDataAsync(PlcLogEntryDto plcLogEntryDto,CancellationToken token)
+        public async Task SendDataAsync(PlcLogEntityDto plcLogEntryDto,CancellationToken token)
         {
             string sql = @"
             INSERT INTO `diagramrooms`.`datapoints` 
@@ -122,6 +123,76 @@ namespace LoggerDiagram.DataAccess
                 throw;
             }
             catch (MySqlException ex)   
+            {
+                _logger.Error(ex, "Ошибка со стороны базы данных");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Непредвиденная ошибка");
+                throw;
+            }
+        }
+
+        public async Task<List<int>> GetAllGraphIdsAsync(CancellationToken token)
+        {
+            string sql = "SELECT IdGraph FROM Graph ORDER BY IdGraph;";
+
+            try
+            {
+                using (var connection = new MySqlConnection(_connectionString))
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    await connection.OpenAsync(token);
+
+                    using (var command = new MySqlCommand(sql, connection))
+                    {
+                        token.ThrowIfCancellationRequested();
+
+                        using (var reader = await command.ExecuteReaderAsync(token))
+                        {
+                            List<int> graphIds = new List<int>();
+
+                            token.ThrowIfCancellationRequested();
+
+                            while (await reader.ReadAsync(token))
+                            {
+                                var result = reader["IdGraph"];
+
+                                if (result == DBNull.Value || result == null)
+                                {
+                                    _logger.Warn($"Поле {nameof(result)} == null");
+                                    throw new InvalidOperationException($"Поле {nameof(result)} == null");
+                                }
+
+                                if (!(result is int idGraph))
+                                {
+                                    _logger.Error($"Неверное преобразование {nameof(idGraph)} из БД. Значение: {result}");
+                                    throw new InvalidCastException($"Неверный тип данных для {nameof(idGraph)}");
+                                }
+
+                                graphIds.Add(idGraph);
+                            }
+
+                            if (graphIds == null)
+                            {
+                                _logger.Error($"Список {nameof(graphIds)} полученный из бд == null");
+                                throw new NullReferenceException($"Список {nameof(graphIds)} полученный из бд == null");
+                            }
+
+                            _logger.Info("Операция GetAllGraphIdsAsync выполнена");
+                            return graphIds;
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.Warn("Операция была отменена");
+                throw;
+            }
+            catch (MySqlException ex)
             {
                 _logger.Error(ex, "Ошибка со стороны базы данных");
                 throw;

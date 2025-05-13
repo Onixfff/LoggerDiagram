@@ -17,14 +17,14 @@ namespace LoggerDiagram
 
             using(var score = container.BeginLifetimeScope())
             {
-                var application = score.Resolve<ApplicationService>();
+                var application = score.Resolve<PlcDataProcessor>();
                 var logger = score.Resolve<ILogger>();
 
                 var cts = new CancellationTokenSource();
 
                 try
                 {
-                    await application.RunAsync(cts.Token);
+                    await application.ProcessAsync(cts.Token);
                 }
                 catch (OperationCanceledException ex)
                 {

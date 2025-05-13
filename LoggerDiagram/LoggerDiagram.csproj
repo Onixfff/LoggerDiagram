@@ -126,21 +126,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Application\ApplicationService.cs" />
+    <Compile Include="Application\PlcDataProcessor.cs" />
     <Compile Include="DataAccess\DataBaseRepository.cs" />
     <Compile Include="DataAccess\IDataBaseRepository.cs" />
     <Compile Include="DependencyInjection\ContainerConfig.cs" />
-    <Compile Include="DTO\PlcLogEntryDto.cs" />
+    <Compile Include="DTO\PlcLogEntityDto.cs" />
     <Compile Include="Enums\RawByteValueEnum.cs" />
     <Compile Include="Factory\IPlcDataReaderFactory.cs" />
     <Compile Include="Factory\PlcDataReaderFactory.cs" />
     <Compile Include="Models\Data\DataPoints.cs" />
     <Compile Include="Models\Data\Graph.cs" />
-    <Compile Include="Models\Plc\PlcLogEntry.cs" />
+    <Compile Include="Models\Plc\PlcLogEntity.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IPlcDataReader.cs" />
+    <Compile Include="Services\BatchNumberAdjuster.cs" />
+    <Compile Include="Services\GraphIdSplitter.cs" />
+    <Compile Include="Services\Interfaces\IBatchNumberAdjuster.cs" />
+    <Compile Include="Services\Interfaces\IGraphIdSplitter.cs" />
+    <Compile Include="Services\Interfaces\IPlcDataConverter.cs" />
+    <Compile Include="Services\Interfaces\IPlcDataReader.cs" />
+    <Compile Include="Services\Interfaces\IPlcDataSender.cs" />
+    <Compile Include="Services\Interfaces\IPlcReaderService.cs" />
+    <Compile Include="Services\PlcDataConverter.cs" />
     <Compile Include="Services\PlcDataReader.cs" />
+    <Compile Include="Services\PlcDataSender.cs" />
+    <Compile Include="Services\PlcReaderService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
