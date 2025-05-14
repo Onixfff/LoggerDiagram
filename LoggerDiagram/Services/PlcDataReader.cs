@@ -28,8 +28,9 @@ namespace LoggerDiagram.Services
 
                 token.ThrowIfCancellationRequested();
 
+                //Тут считывается Status(0 или 1)
                 var resultByte = await _plc.ReadAsync(DataType.DataBlock, 1, byteStart, VarType.Byte, 1, cancellationToken: token);
-
+                
                 if (!(resultByte is byte byteValue))
                 {
                     _logger.Error($"Неверное преобразование {nameof(byteValue)} из PLC \n" +
@@ -40,31 +41,33 @@ namespace LoggerDiagram.Services
 
                 token.ThrowIfCancellationRequested();
 
-                var resultDouble = await _plc.ReadAsync(DataType.DataBlock, 1, doubleStart, VarType.Real, 1, cancellationToken: token);
+                //Тут считывается Value
+                var resultFloat = await _plc.ReadAsync(DataType.DataBlock, 1, doubleStart, VarType.Real, 1, cancellationToken: token);
 
-                if (!(resultDouble is double doubleValue))
+                if (!(resultFloat is float floatValue))
                 {
-                    _logger.Error($"Неверное преобразование {nameof(doubleValue)} из PLC \n" +
-                        $"Address: {doubleStart}, Expected type: byte, Actual type: {resultDouble?.GetType()}");
-                    throw new InvalidCastException(nameof(doubleValue));
+                    _logger.Error($"Неверное преобразование {nameof(floatValue)} из PLC \n" +
+                        $"Address: {doubleStart}, Expected type: byte, Actual type: {resultFloat?.GetType()}");
+                    throw new InvalidCastException(nameof(floatValue));
                 }
 
-                _logger.Info($"Успешно прочитано значение {doubleValue} по адресу {doubleStart}.");
+                _logger.Info($"Успешно прочитано значение {floatValue} по адресу {doubleStart}.");
 
                 token.ThrowIfCancellationRequested();
+                
+                //Тут считывается Time
+                var resultshort = await _plc.ReadAsync(DataType.DataBlock, 1, timeStart, VarType.Int, 1, cancellationToken: token);
 
-                var resultInt = await _plc.ReadAsync(DataType.DataBlock, 1, timeStart, VarType.Real, 1, cancellationToken: token);
-
-                if (!(resultInt is int intValue))
+                if (!(resultshort is short intValue))
                 {
                     _logger.Error($"Неверное преобразование {nameof(intValue)} PLC \n" +
-                        $"Address: {timeStart}, Expected type: byte, Actual type: {resultInt?.GetType()}");
+                        $"Address: {timeStart}, Expected type: byte, Actual type: {resultshort.GetType()}");
                     throw new InvalidCastException(nameof(intValue));
                 }
 
                 _logger.Info($"Успешно прочитано значение {intValue} по адресу {timeStart}.");
 
-                plcLogEntry = PlcLogEntity.Create(byteValue, doubleValue, intValue);
+                plcLogEntry = PlcLogEntity.Create(byteValue, floatValue, intValue);
                 _logger.Info($"Успешное создание PlcLogEntry");
 
                 return plcLogEntry;

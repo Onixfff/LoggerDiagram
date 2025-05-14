@@ -24,7 +24,11 @@ namespace LoggerDiagram
 
                 try
                 {
-                    await application.ProcessAsync(cts.Token);
+                    while (!cts.IsCancellationRequested)
+                    {
+                        await application.ProcessAsync(cts.Token);
+                        await Task.Delay(1000, cts.Token);
+                    }
                 }
                 catch (OperationCanceledException ex)
                 {

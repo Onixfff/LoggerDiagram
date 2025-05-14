@@ -33,7 +33,7 @@ namespace LoggerDiagram.Services
 
                 if (entity[i].RawByteValue == 0)
                 {
-                    return null; // Не отправляем данные
+                    continue; // Не отправляем данные
                 }
 
                 dtos.Add(PlcLogEntityDto.Create(ids[i], batch, entity[i].RawByteValue, entity[i].Value, entity[i].Time));

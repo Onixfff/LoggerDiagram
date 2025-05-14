@@ -38,9 +38,8 @@ namespace LoggerDiagram.Application
             ValidateIps(ipEven);
 
             var allIds = await GetAllGraphIdsAsync(token);
-            var (evenIds, oddIds) = _splitter.Split(allIds);
 
-            await ProcessGroupAsync(evenIds, ipEven, token);
+            await ProcessGroupAsync(allIds, ipEven, token);
         }
 
         private void ValidateIps(string ipEven)
@@ -65,7 +64,7 @@ namespace LoggerDiagram.Application
             var data = await _readerService.ReadPlcLogsAsync(ids, reader, token);
             var dtos = await _converter.ConvertAsync(ids, data, token);
             
-            if (dtos == null)
+            if (dtos == null || dtos.Count == 0)
                 return;
 
             await _sender.SendAsync(dtos, token);

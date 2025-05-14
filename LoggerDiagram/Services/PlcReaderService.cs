@@ -1,4 +1,5 @@
 ﻿using LoggerDiagram.Models.Plc;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,12 +17,19 @@ namespace LoggerDiagram.Services
 
             foreach (var id in ids)
             {
-                var entity = await reader.GetDataAsync(offsetByte, offsetDouble, offsetTime, token);
-                result.Add(entity);
+                try
+                {
+                    var entity = await reader.GetDataAsync(offsetByte, offsetDouble, offsetTime, token);
+                    result.Add(entity);
 
-                offsetByte += 8;
-                offsetDouble += 8;
-                offsetTime += 8;
+                    offsetByte += 8;
+                    offsetDouble += 8;
+                    offsetTime += 8;
+                }
+                catch(Exception)
+                {
+                    throw;
+                }
             }
 
             return result;
