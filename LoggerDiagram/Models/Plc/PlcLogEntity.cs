@@ -6,16 +6,16 @@ namespace LoggerDiagram.Models.Plc
     {
         public readonly Byte RawByteValue;
         public readonly double Value;
-        public readonly int Time;
+        public readonly short Time;
 
-        private PlcLogEntity(byte rawByteValue, double value, int time)
+        private PlcLogEntity(byte rawByteValue, double value, short time)
         {
             RawByteValue = rawByteValue;
             Value = value;
             Time = time;
         }
 
-        public static PlcLogEntity Create(byte rawByteValue, double value, int time)
+        public static PlcLogEntity Create(byte rawByteValue, double value, short time)
         {
             //Проверки
 
