@@ -7,11 +7,11 @@ namespace LoggerDiagram.DTO
     {
         public readonly int IdGraph;
         public readonly int BatchNumber;
-        public readonly RawByteValueEnum Status;
+        public readonly ProductState Status;
         public readonly double Value;
         public readonly int Time;
 
-        private PlcLogEntityDto(int idGraph, int batchNumber, RawByteValueEnum status, double value, int time)
+        private PlcLogEntityDto(int idGraph, int batchNumber, ProductState status, double value, int time)
         {
             IdGraph = idGraph;
             BatchNumber = batchNumber;
@@ -43,17 +43,17 @@ namespace LoggerDiagram.DTO
                 throw new ArgumentOutOfRangeException($"{nameof(batchNumber)} вышел за пределы допустимого диапозона");
             }
 
-            RawByteValueEnum status;
+            ProductState status;
             switch (rawByteValue)
             {
                 case 0:
-                    status = RawByteValueEnum.ZeroProduct;
+                    status = ProductState.ZeroProduct;
                     break;
                 case 1:
-                    status = RawByteValueEnum.IsHaveProduct;
+                    status = ProductState.IsHaveProduct;
                     break;
                 case 100:
-                    status = RawByteValueEnum.Error;
+                    status = ProductState.Error;
                     throw new InvalidOperationException($"Ошибка {nameof(rawByteValue)}: {rawByteValue} получил значение ошибки");
                 default:
                     throw new InvalidOperationException($"Недопустимое значение rawByteValue: {rawByteValue}");

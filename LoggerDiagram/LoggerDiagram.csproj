@@ -131,7 +131,7 @@
     <Compile Include="DataAccess\IDataBaseRepository.cs" />
     <Compile Include="DependencyInjection\ContainerConfig.cs" />
     <Compile Include="DTO\PlcLogEntityDto.cs" />
-    <Compile Include="Enums\RawByteValueEnum.cs" />
+    <Compile Include="Enums\ProductState.cs" />
     <Compile Include="PlcException\PlcDataReadException.cs" />
     <Compile Include="Factory\IPlcDataReaderFactory.cs" />
     <Compile Include="Factory\PlcDataReaderFactory.cs" />
