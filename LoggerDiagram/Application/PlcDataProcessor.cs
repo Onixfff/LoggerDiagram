@@ -59,7 +59,7 @@ namespace LoggerDiagram.Application
         private async Task ProcessGroupAsync(List<int> ids, string ip,  CancellationToken token)
         {
             IPlcDataReader reader = _readerFactory.Create(ip);
-            var data = await _readerService.ReadPlcLogsAsync(ids, reader, token);
+            var data = await _readerService.GetPlcSensorReadingsAsync(ids, reader, token);
             var dtos = await _converter.ConvertAsync(ids, data, token);
             
             if (dtos == null || dtos.Count == 0)

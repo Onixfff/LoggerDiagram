@@ -16,7 +16,7 @@ namespace LoggerDiagram.Services
         /// <param name="reader"></param>
         /// <param name="token"></param>
         /// <returns> <see cref="List{PlcSensorReading}"/></returns>
-        public async Task<List<PlcSensorReading>> ReadPlcLogsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token)
+        public async Task<List<PlcSensorReading>> GetPlcSensorReadingsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token)
         {
             var result = new List<PlcSensorReading>();
             int offsetByte = 0;

@@ -7,6 +7,6 @@ namespace LoggerDiagram.Services
 {
     public interface IPlcReaderService
     {
-        Task<List<PlcSensorReading>> ReadPlcLogsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token);
+        Task<List<PlcSensorReading>> GetPlcSensorReadingsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token);
     }
 }
