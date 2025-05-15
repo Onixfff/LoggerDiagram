@@ -7,9 +7,9 @@ namespace LoggerDiagram.Services
 {
     public class PlcReaderService : IPlcReaderService
     {
-        public async Task<List<PlcLogEntity>> ReadPlcLogsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token)
+        public async Task<List<PlcSensorReading>> ReadPlcLogsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token)
         {
-            var result = new List<PlcLogEntity>();
+            var result = new List<PlcSensorReading>();
             int offsetByte = 0;
             int offsetByteNameRoom = 1;
             int offsetDouble = 2;

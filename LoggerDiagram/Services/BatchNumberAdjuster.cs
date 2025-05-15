@@ -15,7 +15,7 @@ namespace LoggerDiagram.Services
             _graphStateManager = graphStateManager ?? throw new ArgumentNullException(nameof(graphStateManager));
         }
 
-        public int Adjust(int graphId, int lastBatchNumber, PlcLogEntity entity)
+        public int Adjust(int graphId, int lastBatchNumber, PlcSensorReading entity)
         {
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
@@ -24,7 +24,7 @@ namespace LoggerDiagram.Services
 
             RawByteValueEnum status;
 
-            switch (entity.RawByteValue)
+            switch (entity.StatusByte)
             {
                 case 0:
                     status = RawByteValueEnum.ZeroProduct;
@@ -34,10 +34,10 @@ namespace LoggerDiagram.Services
                     break;
                 case 100:
                     throw new InvalidOperationException(
-                        $"Ошибка {nameof(entity.RawByteValue)}: {entity.RawByteValue}");
+                        $"Ошибка {nameof(entity.StatusByte)}: {entity.StatusByte}");
                 default:
                     throw new InvalidOperationException(
-                        $"Недопустимое значение rawByteValue: {entity.RawByteValue}");
+                        $"Недопустимое значение rawByteValue: {entity.StatusByte}");
             }
 
             // Увеличиваем только если значение стало 0 и раньше было не 0
@@ -47,7 +47,7 @@ namespace LoggerDiagram.Services
             }
 
             // Обновляем состояние после обработки
-            state.LastRawByteValue = entity.RawByteValue;
+            state.LastRawByteValue = entity.StatusByte;
             _graphStateManager.UpdateState(graphId, state);
 
             return lastBatchNumber;

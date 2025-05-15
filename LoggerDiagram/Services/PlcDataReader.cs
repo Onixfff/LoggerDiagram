@@ -30,12 +30,12 @@ namespace LoggerDiagram.Services
         /// <param name="floatStart">Начальный адрес значения типа float. Отвечает за Value (y) </param>
         /// <param name="shortStart">Начальный адрес значения типа short. Отвечает за Time (x)</param>
         /// <param name="token">Токен отмены для прерывания операции</param>
-        /// <returns> Объект <see cref="PlcLogEntity"/> </returns>
+        /// <returns> Объект <see cref="PlcSensorReading"/> </returns>
         /// <exception cref="PlcDataReadException"></exception>
         /// <exception cref="OperationCanceledException"></exception>
-        private async Task<PlcLogEntity> GetDataAsync(int byteStart,int byteStartNameRoom, int floatStart, int shortStart, CancellationToken token)
+        private async Task<PlcSensorReading> GetDataAsync(int byteStart,int byteStartNameRoom, int floatStart, int shortStart, CancellationToken token)
         {
-            PlcLogEntity plcLogEntry;
+            PlcSensorReading plcLogEntry;
 
             try
             {
@@ -46,7 +46,7 @@ namespace LoggerDiagram.Services
                 var doubleValue = await ReadPlcValueAsync<double>(DataType.DataBlock, 1, floatStart, VarType.Real, token);
                 var shortValue = await ReadPlcValueAsync<short>(DataType.DataBlock, 1, shortStart, VarType.Int, token);
 
-                plcLogEntry = PlcLogEntity.Create(byteValue, doubleValue, shortValue);
+                plcLogEntry = PlcSensorReading.Create(byteValue, doubleValue, shortValue);
                 _logger.Info($"Успешное создание PlcLogEntry");
 
                 return plcLogEntry;
@@ -96,8 +96,8 @@ namespace LoggerDiagram.Services
         /// <param name="shortStart">Начальный адрес значения типа short. Отвечает за Time (x)</param>
         /// <param name="token">Токен отмены для прерывания операции.</param>
         /// <param name="maxRetries">Максимально кол-во попыток</param>
-        /// <returns> Объект <see cref="PlcLogEntity"/>, содержащий данные из PLC. Значение может быть null, если все попытки чтения завершились ошибкой.</returns>
-        public async Task<PlcLogEntity> GetDataWithRetryAsync(int byteStart, int byteStartNameRoom, int floatStart, int shortStart, CancellationToken token, int maxRetries = 3)
+        /// <returns> Объект <see cref="PlcSensorReading"/>, содержащий данные из PLC. Значение может быть null, если все попытки чтения завершились ошибкой.</returns>
+        public async Task<PlcSensorReading> GetDataWithRetryAsync(int byteStart, int byteStartNameRoom, int floatStart, int shortStart, CancellationToken token, int maxRetries = 3)
         {
             int attempt = 0;
             int delay = 2000;

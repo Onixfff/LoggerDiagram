@@ -8,6 +8,6 @@ namespace LoggerDiagram.Services
 {
     public interface IPlcDataConverter
     {
-        Task<List<PlcLogEntityDto>> ConvertAsync(List<int> ids, List<PlcLogEntity> entities, CancellationToken token);
+        Task<List<PlcLogEntityDto>> ConvertAsync(List<int> ids, List<PlcSensorReading> entities, CancellationToken token);
     }
 }
