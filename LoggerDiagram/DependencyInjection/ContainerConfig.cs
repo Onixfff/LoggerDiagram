@@ -57,10 +57,6 @@ namespace LoggerDiagram.DependencyInjection
                 .As<IPlcDataConverter>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<GraphIdSplitter>()
-                .As<IGraphIdSplitter>()
-                .InstancePerLifetimeScope();
-
             builder.RegisterType<BatchNumberAdjuster>()
                 .As<IBatchNumberAdjuster>()
                 .InstancePerLifetimeScope();

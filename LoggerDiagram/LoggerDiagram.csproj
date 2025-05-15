@@ -142,10 +142,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BatchNumberAdjuster.cs" />
-    <Compile Include="Services\GraphIdSplitter.cs" />
     <Compile Include="Services\InMemoryGraphStateManager.cs" />
     <Compile Include="Services\Interfaces\IBatchNumberAdjuster.cs" />
-    <Compile Include="Services\Interfaces\IGraphIdSplitter.cs" />
     <Compile Include="Services\Interfaces\IGraphStateManager.cs" />
     <Compile Include="Services\Interfaces\IPlcDataConverter.cs" />
     <Compile Include="Services\Interfaces\IPlcDataReader.cs" />
