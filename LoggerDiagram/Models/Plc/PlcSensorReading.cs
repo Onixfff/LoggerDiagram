@@ -13,19 +13,19 @@ namespace LoggerDiagram.Models.Plc
         /// <summary>
         /// Состояние устройства, характеризующее текущий статус (например, наличие продукта, или его отсутствие, ошибку)
         /// </summary>
-        public ProductState Status;
+        public readonly ProductState Status;
         /// <summary>
         /// Номер помещения, от которого получены данные (если доступен).
         /// </summary>
-        public Byte? RoomNumber;
+        public readonly Byte? RoomNumber;
         /// <summary>
         /// числовое значение измерения.
         /// </summary>
-        public double Value;
+        public readonly double Value;
         /// <summary>
         /// Временная метка события, связанного с измерением.
         /// </summary>
-        public short Time;
+        public readonly short Time;
 
         /// <summary>
         /// Представляет 
