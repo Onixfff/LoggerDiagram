@@ -1,6 +1,6 @@
 ﻿namespace LoggerDiagram.Enums
 {
-    public enum RawByteValueEnum
+    public enum ProductState
     {
         ZeroProduct = 0,
         IsHaveProduct = 1,

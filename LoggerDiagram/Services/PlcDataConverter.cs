@@ -31,12 +31,12 @@ namespace LoggerDiagram.Services
                 int batch = await _repository.GetLastBatchNumberByGraphAsync(ids[i], token);
                 batch = _batchAdjuster.Adjust(ids[i], batch, entity[i]);
 
-                if (entity[i].StatusByte == 0)
+                if (entity[i].Status == 0)
                 {
                     return null; // Не отправляем данные
                 }
 
-                dtos.Add(PlcLogEntityDto.Create(ids[i], batch, entity[i].StatusByte, entity[i].Value, entity[i].Time));
+                dtos.Add(PlcLogEntityDto.Create(ids[i], batch, entity[i].Status, entity[i].Value, entity[i].Time));
             }
 
             return dtos;
