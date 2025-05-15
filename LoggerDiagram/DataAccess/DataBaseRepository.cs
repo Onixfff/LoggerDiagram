@@ -103,7 +103,8 @@ namespace LoggerDiagram.DataAccess
                         if (result == DBNull.Value || result == null)
                         {
                             _logger.Warn($"Поле MaxBatchNumber содержит null значение для IdGraph = {idGraph}");
-                            throw new InvalidOperationException($"Поле MaxBatchNumber содержит null значение для IdGraph = {idGraph}");
+                            _logger.Info($"Запрос выполнен успешно. MaxBatchNumber = 0");
+                            return 0;
                         }
 
                         if (!(result is int maxBatchNumber))
