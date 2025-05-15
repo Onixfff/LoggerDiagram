@@ -20,7 +20,7 @@ namespace LoggerDiagram.DataAccess
             _logger = logger;
         }
 
-        public async Task SendDataAsync(PlcLogEntityDto plcLogEntryDto,CancellationToken token)
+        public async Task SendDataAsync(PlcLogEntityDto plcLogEntryDto, CancellationToken token)
         {
             string sql = @"
             INSERT INTO `diagramrooms`.`datapoints` 
@@ -29,13 +29,13 @@ namespace LoggerDiagram.DataAccess
         ";
             try
             {
-                using(var connection = new MySqlConnection(_connectionString))
+                using (var connection = new MySqlConnection(_connectionString))
                 {
                     token.ThrowIfCancellationRequested();
 
                     await connection.OpenAsync(token);
 
-                    using (var command = new MySqlCommand(sql ,connection))
+                    using (var command = new MySqlCommand(sql, connection))
                     {
                         //Добавляем параметры
                         command.Parameters.AddWithValue("@IdGraph", plcLogEntryDto.IdGraph);
@@ -62,7 +62,7 @@ namespace LoggerDiagram.DataAccess
                 _logger.Error(ex, "Ошибка со стороны базы данных");
                 throw;
             }
-            catch(DbException ex)
+            catch (DbException ex)
             {
                 _logger.Error(ex, "Непредвиденная ошибка с базой данных");
                 throw;
