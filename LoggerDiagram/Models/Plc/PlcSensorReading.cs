@@ -9,13 +9,22 @@ namespace LoggerDiagram.Models.Plc
     /// </summary>
     public class PlcSensorReading
     {
+        //TODO Добавить get set и работы с ними для этих данных
         /// <summary>
         /// Состояние устройства, характеризующее текущий статус (например, наличие продукта, или его отсутствие, ошибку)
         /// </summary>
         public ProductState Status;
-        
-        public Byte? RoomNumber { get; private set; }
+        /// <summary>
+        /// Номер помещения, от которого получены данные (если доступен).
+        /// </summary>
+        public Byte? RoomNumber;
+        /// <summary>
+        /// числовое значение измерения.
+        /// </summary>
         public double Value;
+        /// <summary>
+        /// Временная метка события, связанного с измерением.
+        /// </summary>
         public short Time;
 
         /// <summary>
@@ -41,10 +50,10 @@ namespace LoggerDiagram.Models.Plc
         /// <param name="value"></param>
         /// <param name="time"></param>
         /// <returns>Обьект <see cref="PlcSensorReading"/></returns>
-        public static PlcSensorReading Create(byte rawByteValue, byte rawByteRoom, double value, short time)
+        public static PlcSensorReading Create(ProductState statusByte, byte rawByteRoom, double value, short time)
         {
             //TODO Проверки данных добавить
-            return new PlcSensorReading(rawByteValue, rawByteRoom, value, time);
+            return new PlcSensorReading(statusByte, rawByteRoom, value, time);
         }
     }
 }
