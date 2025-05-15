@@ -60,6 +60,10 @@ namespace LoggerDiagram.Application
         {
             IPlcDataReader reader = _readerFactory.Create(ip);
             var data = await _readerService.GetPlcSensorReadingsAsync(ids, reader, token);
+            
+            if(data == null)
+                return;
+            
             var dtos = await _converter.ConvertAsync(ids, data, token);
             
             if (dtos == null)
