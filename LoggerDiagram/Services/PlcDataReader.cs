@@ -1,4 +1,5 @@
 ﻿using LoggerDiagram.Models.Plc;
+using LoggerDiagram.PlcException;
 using NLog;
 using S7.Net;
 using System;
@@ -18,7 +19,16 @@ namespace LoggerDiagram.Services
             _plc = new Plc(CpuType.S71200, ip, 0, 1);
         }
 
-        public async Task<PlcLogEntity> GetDataAsync(int byteStart, int doubleStart, int timeStart, CancellationToken token)
+        /// <summary> Выполняет попытку чтения данных из PLC по указанным адресам. </summary>
+        /// <param name="byteStart">Начальный адрес байта отвечающий за 1 и 0</param>
+        /// <param name="byteStartNameRoom">Начальный адрес байта, содержащий номер помещения</param>
+        /// <param name="floatStart">Начальный адрес значения типа float. Отвечает за Value (y) </param>
+        /// <param name="shortStart">Начальный адрес значения типа short. Отвечает за Time (x)</param>
+        /// <param name="token">Токен отмены для прерывания операции</param>
+        /// <returns> Объект <see cref="PlcLogEntity"/> </returns>
+        /// <exception cref="PlcDataReadException"></exception>
+        /// <exception cref="OperationCanceledException"></exception>
+        private async Task<PlcLogEntity> GetDataAsync(int byteStart,int byteStartNameRoom, int floatStart, int shortStart, CancellationToken token)
         {
             PlcLogEntity plcLogEntry;
 
@@ -26,63 +36,34 @@ namespace LoggerDiagram.Services
             {
                 await _plc.OpenAsync(token);
 
-                token.ThrowIfCancellationRequested();
+                var byteValue = await ReadPlcValueAsync<byte>(DataType.DataBlock, 1, byteStart, VarType.Byte, token);
+                var byteValueNameRoom = await ReadPlcValueAsync<byte>(DataType.DataBlock, 1, byteStartNameRoom, VarType.Byte, token);
+                var doubleValue = await ReadPlcValueAsync<double>(DataType.DataBlock, 1, floatStart, VarType.Real, token);
+                var shortValue = await ReadPlcValueAsync<short>(DataType.DataBlock, 1, shortStart, VarType.Int, token);
 
-                var resultByte = await _plc.ReadAsync(DataType.DataBlock, 1, byteStart, VarType.Byte, 1, cancellationToken: token);
-
-                if (!(resultByte is byte byteValue))
-                {
-                    _logger.Error($"Неверное преобразование {nameof(byteValue)} из PLC \n" +
-                        $"Address: {byteStart}, Expected type: byte, Actual type: {resultByte?.GetType()}");
-                    throw new InvalidCastException(nameof(byteValue));
-                }
-                _logger.Info($"Успешно прочитано значение {byteValue} по адресу {byteStart}.");
-
-                token.ThrowIfCancellationRequested();
-
-                var resultDouble = await _plc.ReadAsync(DataType.DataBlock, 1, doubleStart, VarType.Real, 1, cancellationToken: token);
-
-                if (!(resultDouble is double doubleValue))
-                {
-                    _logger.Error($"Неверное преобразование {nameof(doubleValue)} из PLC \n" +
-                        $"Address: {doubleStart}, Expected type: byte, Actual type: {resultDouble?.GetType()}");
-                    throw new InvalidCastException(nameof(doubleValue));
-                }
-
-                _logger.Info($"Успешно прочитано значение {doubleValue} по адресу {doubleStart}.");
-
-                token.ThrowIfCancellationRequested();
-
-                var resultInt = await _plc.ReadAsync(DataType.DataBlock, 1, timeStart, VarType.Real, 1, cancellationToken: token);
-
-                if (!(resultInt is int intValue))
-                {
-                    _logger.Error($"Неверное преобразование {nameof(intValue)} PLC \n" +
-                        $"Address: {timeStart}, Expected type: byte, Actual type: {resultInt?.GetType()}");
-                    throw new InvalidCastException(nameof(intValue));
-                }
-
-                _logger.Info($"Успешно прочитано значение {intValue} по адресу {timeStart}.");
-
-                plcLogEntry = PlcLogEntity.Create(byteValue, doubleValue, intValue);
+                plcLogEntry = PlcLogEntity.Create(byteValue, doubleValue, shortValue);
                 _logger.Info($"Успешное создание PlcLogEntry");
 
                 return plcLogEntry;
             }
             catch (InvalidCastException ex)
             {
-                _logger.Error(ex, $"Ошибка преобразования типов при чтении данных из PLC. byteStart: {byteStart}, doubleStart: {doubleStart}, timeStart: {timeStart}");
-                throw;
+                _logger.Error(ex, $"Ошибка преобразования типов при чтении данных из PLC. byteStart: {byteStart}, doubleStart: {floatStart}, timeStart: {shortStart}");
+                throw new PlcDataReadException("Ошибка преобразования типов при чтении данных из PLC", ex);
             }
             catch (OperationCanceledException ex)
             {
-                _logger.Warn(ex, $"Операция была отменена. byteStart: {byteStart}, doubleStart: {doubleStart}, timeStart: {timeStart}");
+                _logger.Warn(ex, $"Операция была отменена. byteStart: {byteStart}, doubleStart: {floatStart}, timeStart: {shortStart}");
+                throw;
+            }
+            catch (PlcDataReadException)
+            {
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Неожиданная ошибка при работе с PLC. byteStart: {byteStart}, doubleStart: {doubleStart}, timeStart: {timeStart}");
-                throw;
+                _logger.Error(ex, $"Неожиданная ошибка при работе с PLC. byteStart: {byteStart}, doubleStart: {floatStart}, timeStart: {shortStart}");
+                throw new PlcDataReadException("Неожиданная ошибка при работе с PLC", ex);
             }
             finally
             {
@@ -98,6 +79,75 @@ namespace LoggerDiagram.Services
                     _logger.Warn(ex, "Ошибка при закрытии соединения с PLC.");
                 }
 
+            }
+        }
+
+        /// <summary>
+        /// Пытается получить данные из PLC с заданным количеством попыток.
+        /// </summary>
+        /// <param name="byteStart">Начальный адрес байта отвечающий за 1 и 0</param>
+        /// <param name="byteStartNameRoom">Начальный адрес байта, содержащий номер помещения</param>
+        /// <param name="floatStart">Начальный адрес значения типа float. Отвечает за Value (y) </param>
+        /// <param name="shortStart">Начальный адрес значения типа short. Отвечает за Time (x)</param>
+        /// <param name="token">Токен отмены для прерывания операции.</param>
+        /// <param name="maxRetries">Максимально кол-во попыток</param>
+        /// <returns> Объект <see cref="PlcLogEntity"/>, содержащий данные из PLC. Значение может быть null, если все попытки чтения завершились ошибкой.</returns>
+        public async Task<PlcLogEntity> GetDataWithRetryAsync(int byteStart, int byteStartNameRoom, int floatStart, int shortStart, CancellationToken token, int maxRetries = 3)
+        {
+            int attempt = 0;
+            int delay = 2000;
+            int retryDelayInSeconds = delay / 1000;
+
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    return await GetDataAsync(byteStart, byteStartNameRoom, floatStart, shortStart, token);
+                }
+                catch(PlcDataReadException ex)
+                {
+                    attempt++;
+                    _logger.Warn(ex, $"Попытка {attempt} не удалась. Повтор через {retryDelayInSeconds} сек.");
+                    await Task.Delay(delay, token);
+                }
+            }
+
+            _logger.Error("Все попытки получения данных из PLC завершились неудачей");
+            return null;
+        }
+
+        /// <summary> Асинхронно читает значение из PLC по указанному адресу и приводит его к типу <typeparamref name="T"/>. </summary>
+        /// <typeparam name="T"> Тип значения, в который будет приведён результат чтения. Работает только с этими типами: byte, float, short. </typeparam>
+        /// <param name="dataType"> Тип области данных PLC (например, DataBlock). </param>
+        /// <param name="dbNumber"> Номер блока данных. </param>
+        /// <param name="offset"> Смещение (адрес) внутри блока данных. </param>
+        /// <param name="varType"> Тип переменной, определяющий размер значения. Работает только с этими типами: Byte, Real, Int. </param>
+        /// <param name="token"> Токен отмены для прерывания операции. </param>
+        /// <returns> Прочитанное значение, приведённое к типу <typeparamref name="T"/>. </returns>
+        /// <exception cref="PlcDataReadException"> Возникает, если произошла ошибка при чтении значения из PLC. </exception>
+        /// <exception cref="InvalidCastException"> Возникает, если произошла ошибка при преобразовании значения из PLC. </exception>
+        private async Task<T> ReadPlcValueAsync<T>(DataType dataType, int dbNumber, int offset, VarType varType, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            try
+            {
+                object result = await _plc.ReadAsync(dataType, dbNumber, offset, varType, 1, cancellationToken: token);
+
+                if (result is T value)
+                {
+                    _logger.Info($"Успешно прочитано значение {value} по адресу {offset}.");
+                    return value;
+                }
+
+                _logger.Error($"Неверное преобразование значения из PLC. " +
+                      $"Address: {offset}, Expected type: {typeof(T)}, Actual type: {result?.GetType()}");
+                throw new InvalidCastException($"Не удалось привести тип к {typeof(T)}");
+            }
+            catch(Exception ex)
+            {
+                _logger.Warn(ex, $"Ошибка при чтении значения из PLC по адресу {offset}");
+                throw new PlcDataReadException("Ошибка при чтении значения из PLC", ex);
             }
         }
     }

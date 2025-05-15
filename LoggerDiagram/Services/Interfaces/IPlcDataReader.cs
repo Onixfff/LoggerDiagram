@@ -6,6 +6,6 @@ namespace LoggerDiagram.Services
 {
     public interface IPlcDataReader
     {
-        Task<PlcLogEntity> GetDataAsync(int byteStart, int doubleStart, int timeStart, CancellationToken token);
+        Task<PlcLogEntity> GetDataWithRetryAsync(int byteStart, int byteStartNameRoom, int doubleStart, int timeStart, CancellationToken token, int maxRetries = 3);
     }
 }
