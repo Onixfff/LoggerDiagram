@@ -16,17 +16,15 @@ namespace LoggerDiagram.Application
         private readonly IPlcReaderService _readerService;
         private readonly IPlcDataConverter _converter;
         private readonly IPlcDataSender _sender;
-        private readonly IGraphIdSplitter _splitter;
         private readonly IPlcDataReaderFactory _readerFactory;
         private readonly ILogger _logger;
 
-        public PlcDataProcessor(IDataBaseRepository repository,IPlcReaderService readerService, IPlcDataConverter converter, IPlcDataSender sender, IGraphIdSplitter splitter, IPlcDataReaderFactory readerFactory, ILogger logger)
+        public PlcDataProcessor(IDataBaseRepository repository,IPlcReaderService readerService, IPlcDataConverter converter, IPlcDataSender sender, IPlcDataReaderFactory readerFactory, ILogger logger)
         {
             _repository = repository;
             _readerService = readerService;
             _converter = converter;
             _sender = sender;
-            _splitter = splitter;
             _readerFactory = readerFactory;
             _logger = logger;
         }   
