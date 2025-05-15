@@ -12,7 +12,12 @@ namespace LoggerDiagram.Services
     {
         private Plc _plc;
         private readonly ILogger _logger;
-
+        
+        /// <summary>
+        /// Инициализирует новый экземпляр класса <see cref="PlcDataReader"/> с указанием IP-адреса PLC и логгера.
+        /// </summary>
+        /// <param name="ip">IP-адрес контроллера PLC.</param>
+        /// <param name="logger">Логгер для записи диагностических сообщений.</param>
         public PlcDataReader(string ip, ILogger logger)
         {
             _logger = logger;
