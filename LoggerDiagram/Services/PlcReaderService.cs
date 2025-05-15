@@ -7,6 +7,14 @@ namespace LoggerDiagram.Services
 {
     public class PlcReaderService : IPlcReaderService
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="reader"></param>
+        /// <param name="token"></param>
+        /// <returns> <see cref="List{PlcSensorReading}"/></returns>
         public async Task<List<PlcSensorReading>> ReadPlcLogsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token)
         {
             var result = new List<PlcSensorReading>();
@@ -18,7 +26,11 @@ namespace LoggerDiagram.Services
             foreach (var id in ids)
             {
                 var PlcSensorData = await reader.GetDataWithRetryAsync(offsetByte, offsetByteNameRoom, offsetDouble, offsetTime, token);
-                result.Add(PlcSensorData);
+                
+                if(PlcSensorData != null)
+                {
+                    result.Add(PlcSensorData);
+                }
 
                 offsetByte += 8;
                 offsetByteNameRoom += 8;
@@ -26,7 +38,10 @@ namespace LoggerDiagram.Services
                 offsetTime += 8;
             }
 
-            return result;
+            if (result.Count > 0)
+                return result;
+            else 
+                return null;
         }
     }
 }

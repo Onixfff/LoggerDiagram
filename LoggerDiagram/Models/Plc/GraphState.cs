@@ -1,11 +1,12 @@
-﻿using System;
+﻿using LoggerDiagram.Enums;
+using System;
 
 namespace LoggerDiagram.Models.Plc
 {
     public class GraphState
     {
-        public int LastBatchNumber { get; set; }
-        public byte? LastRawByteValue { get; set; }
+        public ProductState status { get; set; }
+        public ProductState LastStatus { get; set; }
         public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
 
