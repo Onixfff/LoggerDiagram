@@ -36,7 +36,7 @@ namespace LoggerDiagram.Services
                     continue;
                 }
 
-                dtos.Add(PlcLogEntityDto.Create(ids[i], batch, entity[i].Status, entity[i].Value, entity[i].Time));
+                dtos.Add(PlcLogEntityDto.Create((int)entity[i].RoomNumber, batch, entity[i].Status, entity[i].Value, entity[i].Time));
             }
 
             return dtos;
