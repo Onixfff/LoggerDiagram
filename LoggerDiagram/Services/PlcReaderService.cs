@@ -18,8 +18,8 @@ namespace LoggerDiagram.Services
 
             foreach (var id in ids)
             {
-                var entity = await reader.GetDataWithRetryAsync(offsetByte, offsetByteNameRoom, offsetDouble, offsetTime, token);
-                result.Add(entity);
+                var PlcSensorData = await reader.GetDataWithRetryAsync(offsetByte, offsetByteNameRoom, offsetDouble, offsetTime, token);
+                result.Add(PlcSensorData);
 
                 offsetByte += 8;
                 offsetByteNameRoom += 8;
