@@ -43,7 +43,7 @@ namespace LoggerDiagram.Application
         private void ValidateIps(string ipEven)
         {
             if (string.IsNullOrWhiteSpace(ipEven))
-                throw new ArgumentNullException(nameof(ipEven), "IP для чётных PLC не задан");
+                throw new ArgumentNullException(nameof(ipEven), "IP для PLC не задан");
         }
 
         private async Task<List<int>> GetAllGraphIdsAsync(CancellationToken token)
