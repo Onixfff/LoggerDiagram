@@ -22,32 +22,16 @@ namespace LoggerDiagram.Services
 
             var state = _graphStateManager.GetState(graphId);
 
-            ProductState status;
-
-            switch (entity.Status)
-            {
-                case 0:
-                    status = ProductState.ZeroProduct;
-                    break;
-                case 1:
-                    status = ProductState.IsHaveProduct;
-                    break;
-                case 100:
-                    throw new InvalidOperationException(
-                        $"Ошибка {nameof(entity.Status)}: {entity.Status}");
-                default:
-                    throw new InvalidOperationException(
-                        $"Недопустимое значение rawByteValue: {entity.Status}");
-            }
+            var status = entity.Status;
 
             // Увеличиваем только если значение стало 0 и раньше было не 0
-            if (status == ProductState.ZeroProduct && state.LastRawByteValue != 0)
+            if (status == ProductState.ZeroProduct && state.LastStatus != ProductState.ZeroProduct)
             {
                 lastBatchNumber++;
             }
 
             // Обновляем состояние после обработки
-            state.LastRawByteValue = entity.Status;
+            state.LastStatus = entity.Status;
             _graphStateManager.UpdateState(graphId, state);
 
             return lastBatchNumber;
