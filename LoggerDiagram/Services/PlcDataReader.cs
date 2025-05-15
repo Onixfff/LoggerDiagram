@@ -46,19 +46,21 @@ namespace LoggerDiagram.Services
 
                 var byteValue = await ReadPlcValueAsync<byte>(DataType.DataBlock, 1, byteStart, VarType.Byte, token);
                 var byteValueNameRoom = await ReadPlcValueAsync<byte>(DataType.DataBlock, 1, byteStartNameRoom, VarType.Byte, token);
-                var doubleValue = await ReadPlcValueAsync<double>(DataType.DataBlock, 1, floatStart, VarType.Real, token);
+                var floatValue = await ReadPlcValueAsync<float>(DataType.DataBlock, 1, floatStart, VarType.Real, token);
                 var shortValue = await ReadPlcValueAsync<short>(DataType.DataBlock, 1, shortStart, VarType.Int, token);
 
+                int intValue = (int)byteValue;
+
                 // Преобразуем byte в ProductState
-                if (!Enum.IsDefined(typeof(ProductState), byteValue))
+                if (!Enum.IsDefined(typeof(ProductState), intValue))
                 {
-                    _logger.Error($"Значение {byteValue} не определено в enum {typeof(ProductState)}");
-                    throw new InvalidOperationException($"Недопустимое значение состояния: {byteValue}");
+                    _logger.Error($"Значение {intValue} не определено в enum {typeof(ProductState)}");
+                    throw new InvalidOperationException($"Недопустимое значение состояния: {intValue}");
                 }
 
                 var productState = (ProductState)byteValue;
 
-                plcLogEntry = PlcSensorReading.Create(productState, byteValueNameRoom, doubleValue, shortValue);
+                plcLogEntry = PlcSensorReading.Create(productState, byteValueNameRoom, floatValue, shortValue);
                 _logger.Info($"Успешное создание PlcLogEntry");
 
                 return plcLogEntry;
