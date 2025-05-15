@@ -30,10 +30,10 @@ namespace LoggerDiagram.Models.Plc
         /// <summary>
         /// Представляет 
         /// </summary>
-        /// <param name="statusByte"></param>
-        /// <param name="roomNumber"></param>
-        /// <param name="value"></param>
-        /// <param name="time"></param>
+        /// <param name="statusByte">Enum состояния.</param>
+        /// <param name="roomNumber">Номер помещения, от которого получено значение.</param>
+        /// <param name="value">Числовое значение измерения.</param>
+        /// <param name="time">Временная метка события.</param>
         private PlcSensorReading(ProductState statusByte, byte roomNumber, double value, short time)
         {
             Status = statusByte;
@@ -43,12 +43,12 @@ namespace LoggerDiagram.Models.Plc
         }
 
         /// <summary>
-        /// 
+        /// Инициализирует новый экземпляр класса <see cref="PlcSensorReading"/>.
         /// </summary>
-        /// <param name="rawByteValue"></param>
-        /// <param name="rawByteRoom"></param>
-        /// <param name="value"></param>
-        /// <param name="time"></param>
+        /// <param name="statusByte">Enum состояния.</param>
+        /// <param name="rawByteRoom">Номер помещения, от которого получено значение.</param>
+        /// <param name="value">Числовое значение измерения.</param>
+        /// <param name="time">Временная метка события.</param>
         /// <returns>Обьект <see cref="PlcSensorReading"/></returns>
         public static PlcSensorReading Create(ProductState statusByte, byte rawByteRoom, double value, short time)
         {
