@@ -12,24 +12,19 @@ namespace LoggerDiagram.Services
         {
             var result = new List<PlcLogEntity>();
             int offsetByte = 0;
+            int offsetByteNameRoom = 1;
             int offsetDouble = 2;
             int offsetTime = 6;
 
             foreach (var id in ids)
             {
-                try
-                {
-                    var entity = await reader.GetDataAsync(offsetByte, offsetDouble, offsetTime, token);
-                    result.Add(entity);
+                var entity = await reader.GetDataWithRetryAsync(offsetByte, offsetByteNameRoom, offsetDouble, offsetTime, token);
+                result.Add(entity);
 
-                    offsetByte += 8;
-                    offsetDouble += 8;
-                    offsetTime += 8;
-                }
-                catch(Exception)
-                {
-                    throw;
-                }
+                offsetByte += 8;
+                offsetByteNameRoom += 8;
+                offsetDouble += 8;
+                offsetTime += 8;
             }
 
             return result;
