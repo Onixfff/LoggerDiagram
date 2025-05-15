@@ -10,12 +10,19 @@ namespace LoggerDiagram.Services
     {
 
         /// <summary>
-        /// 
+        /// Асинхронно считывает данные с датчиков, подключенных к ПЛК, используя указанные смещения для каждого датчика.
         /// </summary>
-        /// <param name="ids"></param>
-        /// <param name="reader"></param>
-        /// <param name="token"></param>
-        /// <returns> <see cref="List{PlcSensorReading}"/></returns>
+        /// Для каждого элемента в коллекции <paramref name="ids"/> метод вычисляет 
+        /// последовательные смещения и вызывает GetDataWithRetryAsync дл яполучения данных.
+        /// Смещения увеличиваются на 8 байт на каждой итерации.
+        /// </remarks>
+        /// <param name="ids">Список идентификаторов датчиков.</param>
+        /// <param name="reader">Объект, реализующий интерфейс чтения данных из ПЛК.</param>
+        /// <param name="token">Токен отмены для прерывания операции</param>
+        /// <returns>
+        /// Возвращает список объектов <see cref="PlcSensorReading"/>, представляющих собой 
+        /// показания датчиков. Если данные не были получены, возвращается null.
+        /// </returns>
         public async Task<List<PlcSensorReading>> GetPlcSensorReadingsAsync(List<int> ids, IPlcDataReader reader, CancellationToken token)
         {
             var result = new List<PlcSensorReading>();
