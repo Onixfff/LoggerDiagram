@@ -1,4 +1,5 @@
-﻿using LoggerDiagram.Models.Plc;
+﻿using System;
+using LoggerDiagram.Models.Plc;
 
 namespace LoggerDiagram.Services.Interfaces
 {
