@@ -74,6 +74,17 @@ namespace LoggerDiagram.DataAccess
             }
         }
 
+        /// <summary>
+        /// Асинхронно получает последнее значение номера партии (BatchNumber) для указанного графика из базы данных.
+        /// Если данные отсутствуют, возвращается 0.
+        /// </summary>
+        /// <param name="idGraph">Идентификатор графика, для которого запрашивается последний BatchNumber.</param>
+        /// <param name="token">Токен отмены для прерывания операции.</param>
+        /// <returns>Последнее значение BatchNumber или 0, если записей нет.</returns>
+        /// <exception cref="OperationCanceledException">Возникает, если операция была отменена через CancellationToken.</exception>
+        /// <exception cref="MySqlException">Возникает при ошибках взаимодействия с базой данных.</exception>
+        /// <exception cref="InvalidCastException">Возникает, если значение MaxBatchNumber из БД не может быть преобразовано в int.</exception>
+        /// <exception cref="Exception">Непредвиденные ошибки во время выполнения запроса.</exception>
         public async Task<int> GetLastBatchNumberByGraphAsync(int idGraph, CancellationToken token)
         {
             string sql = @"
@@ -102,35 +113,34 @@ namespace LoggerDiagram.DataAccess
 
                         if (result == DBNull.Value || result == null)
                         {
-                            _logger.Warn($"Поле MaxBatchNumber содержит null значение для IdGraph = {idGraph}");
-                            _logger.Info($"Запрос выполнен успешно. MaxBatchNumber = 0");
+                            _logger.Warn($"MaxBatchNumber равен NULL для IdGraph = {idGraph}. Возвращено значение по умолчанию: 0.");
                             return 0;
                         }
 
                         if (!(result is int maxBatchNumber))
                         {
-                            _logger.Error($"Неверное преобразование MaxBatchNumber из БД. Значение: {result}");
-                            throw new InvalidCastException("Неверный тип данных для MaxBatchNumber");
+                            _logger.Error($"Ошибка преобразования значения {nameof(maxBatchNumber)}. Получено: {result.GetType().Name}");
+                            throw new InvalidCastException($"Значение {nameof(maxBatchNumber)} из базы данных не является целым числом.");
                         }
 
-                        _logger.Info($"Запрос выполнен успешно. MaxBatchNumber = {maxBatchNumber}");
+                        _logger.Trace($"Успешно получено значение {nameof(maxBatchNumber)} = {maxBatchNumber} для IdGraph = {idGraph}.");
                         return maxBatchNumber;
                     }
                 }
             }
             catch (OperationCanceledException)
             {
-                _logger.Warn("Операция была отменена");
+                _logger.Warn("Операция получения BatchNumber была отменена.");
                 throw;
             }
             catch (MySqlException ex)   
             {
-                _logger.Error(ex, "Ошибка со стороны базы данных");
+                _logger.Error(ex, $"Ошибка при выполнении SQL-запроса для IdGraph = {idGraph}");
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "Непредвиденная ошибка");
+                _logger.Error(ex, $"Неизвестная ошибка при получении BatchNumber для IdGraph = {idGraph}");
                 throw;
             }
         }
