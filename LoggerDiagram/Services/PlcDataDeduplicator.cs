@@ -3,8 +3,6 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LoggerDiagram.Services
 {
@@ -19,6 +17,7 @@ namespace LoggerDiagram.Services
         {
             _logger = logger;
         }
+
         /// <summary>
         /// Проверяет, является ли новая запись дубликатом существующей по IdGraph, Time и Value.
         /// </summary>
