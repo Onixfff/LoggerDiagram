@@ -2,6 +2,9 @@
 
 namespace LoggerDiagram.Services.Interfaces
 {
+    /// <summary>
+    /// Реализация <see cref="IGraphStateManager"/> для хранения состояния графиков в оперативной памяти.
+    /// </summary>
     public interface IGraphStateManager
     {
         GraphState GetState(int graphId);
