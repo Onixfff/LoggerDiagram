@@ -56,7 +56,7 @@ namespace LoggerDiagram.Application
 
             return ids;
         }
-
+        
         private async Task ProcessGroupAsync(List<int> ids, string ip,  CancellationToken token)
         {
             IPlcDataReader reader = _readerFactory.Create(ip);
