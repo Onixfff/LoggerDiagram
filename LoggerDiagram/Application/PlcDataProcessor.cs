@@ -19,6 +19,7 @@ namespace LoggerDiagram.Application
         private readonly IPlcDataReaderFactory _readerFactory;
         private readonly ILogger _logger;
 
+        //Todo добавить try catch
         public PlcDataProcessor(IDataBaseRepository repository,IPlcReaderService readerService, IPlcDataConverter converter, IPlcDataSender sender, IPlcDataReaderFactory readerFactory, ILogger logger)
         {
             _repository = repository;
@@ -64,11 +65,13 @@ namespace LoggerDiagram.Application
             if(data == null)
                 return;
             
+            //TODO Доделать Try catch
             var dtos = await _converter.ConvertAsync(ids, data, token);
             
             if (dtos == null)
                 return;
 
+            //TODO ДОДЕЛАТЬ Try catch
             await _sender.SendAsync(dtos, token);
         }
 
