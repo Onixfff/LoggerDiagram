@@ -24,23 +24,30 @@ namespace LoggerDiagram.Services
 
         public async Task<List<PlcLogEntityDto>> ConvertAsync(List<int> ids, List<PlcSensorReading> entity, CancellationToken token)
         {
-            if (ids == null || entity == null)
-                throw new ArgumentNullException("Параметры ids или entity не могут быть null");
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity), "Равен null");
+            }
 
-            var dtos = new List<PlcLogEntityDto>();
+            if (ids == null)
+            {
+                throw new ArgumentNullException(nameof(ids), "Равен null");
+            }
 
-            int count = Math.Min(ids.Count, entity.Count);
+            var dos = new List<PlcLogEntityDto>();
+
+            var count = Math.Min(ids.Count, entity.Count);
 
             if (ids.Count != entity.Count)
             {
                 _logger.Warn($"Кол-во данных {nameof(ids)} - {ids.Count} != {nameof(entity)} - {entity.Count}. Обработано: {count}");
             }
 
-            for(int i = 0; i < count; i++)
+            for(var i = 0; i < count; i++)
             {
                 try
                 {
-                    int batch = await _repository.GetLastBatchNumberByGraphAsync(ids[i], token);
+                    var batch = await _repository.GetLastBatchNumberByGraphAsync(ids[i], token);
                     batch = _batchAdjuster.Adjust(ids[i], batch, entity[i]);
 
                     if (entity[i].Status == 0)
@@ -48,7 +55,7 @@ namespace LoggerDiagram.Services
                         continue;
                     }
 
-                    dtos.Add(PlcLogEntityDto.Create((int)entity[i].RoomNumber, batch, entity[i].Status, entity[i].Value, entity[i].Time));
+                    dos.Add(PlcLogEntityDto.Create((int)entity[i].RoomNumber, batch, entity[i].Status, entity[i].Value, entity[i].Time));
 
                 }
                 catch
@@ -58,7 +65,7 @@ namespace LoggerDiagram.Services
 
             }
 
-            return dtos;
+            return dos;
         }
     }
 }
