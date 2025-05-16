@@ -1,10 +1,10 @@
-﻿using LoggerDiagram.DTO;
-using LoggerDiagram.Models.Plc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+using LoggerDiagram.DTO;
+using LoggerDiagram.Models.Plc;
 
-namespace LoggerDiagram.Services
+namespace LoggerDiagram.Services.Interfaces
 {
     public interface IPlcDataConverter
     {
