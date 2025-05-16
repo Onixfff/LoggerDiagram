@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
+using InvalidCastException = System.InvalidCastException;
 
 namespace LoggerDiagram.Services
 {
@@ -58,13 +60,28 @@ namespace LoggerDiagram.Services
                     }
 
                     _logger.Warn(new ArgumentNullException(nameof(uIntPtr)));
+
                     dos.Add(PlcLogEntityDto.Create((int)uIntPtr, batch, entity[i].Status, entity[i].Value, entity[i].Time));
+
+                    return dos;
                 }
-                catch
+                catch (OperationCanceledException)
                 {
+
                 }
-            }
-            return dos;
+                catch (MySqlException)
+                {
+
+                }
+                catch (InvalidCastException)
+                {
+
+                }
+                catch (Exception)
+                {
+
+                }
+
         }
     }
 }
