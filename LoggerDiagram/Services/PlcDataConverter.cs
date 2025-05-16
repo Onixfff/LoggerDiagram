@@ -1,13 +1,13 @@
-﻿using LoggerDiagram.DataAccess;
-using LoggerDiagram.DTO;
-using LoggerDiagram.Models.Plc;
-using NLog;
+﻿using NLog;
 using System;
-using System.Collections.Generic;
 using System.Threading;
+using LoggerDiagram.DTO;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
-using InvalidCastException = System.InvalidCastException;
+using LoggerDiagram.DataAccess;
+using LoggerDiagram.Models.Plc;
+using System.Collections.Generic;
+using LoggerDiagram.Services.Interfaces;
 
 namespace LoggerDiagram.Services
 {
@@ -40,11 +40,12 @@ namespace LoggerDiagram.Services
                 _logger.Warn($"Кол-во данных {nameof(ids)} - {ids.Count} != {nameof(entity)} - {entity.Count}. Обработано: {count}");
             }
 
-            for(var i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 try
                 {
                     var batch = await _repository.GetLastBatchNumberByGraphAsync(ids[i], token).ConfigureAwait(false);
+
                     batch = _batchAdjuster.Adjust(ids[i], batch, entity[i]);
 
                     if (entity[i].Status == 0)
@@ -61,27 +62,24 @@ namespace LoggerDiagram.Services
 
                     _logger.Warn(new ArgumentNullException(nameof(uIntPtr)));
 
-                    dos.Add(PlcLogEntityDto.Create((int)uIntPtr, batch, entity[i].Status, entity[i].Value, entity[i].Time));
+                    dos.Add(PlcLogEntityDto.Create((int)uIntPtr, batch, entity[i].Status, entity[i].Value,
+                        entity[i].Time));
 
-                    return dos;
                 }
                 catch (OperationCanceledException)
                 {
-
+                    throw;
                 }
                 catch (MySqlException)
                 {
-
+                    throw;
                 }
                 catch (InvalidCastException)
                 {
-
+                    throw;
                 }
-                catch (Exception)
-                {
-
-                }
-
+            }
+            return dos;
         }
     }
 }

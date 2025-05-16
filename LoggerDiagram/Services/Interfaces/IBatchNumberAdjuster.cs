@@ -1,6 +1,6 @@
 ﻿using LoggerDiagram.Models.Plc;
 
-namespace LoggerDiagram.Services
+namespace LoggerDiagram.Services.Interfaces
 {
     public interface IBatchNumberAdjuster
     {
