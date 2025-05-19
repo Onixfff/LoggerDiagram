@@ -27,24 +27,26 @@ namespace LoggerDiagram.Services
 
         /// <summary>
         /// Корректирует номер партии в зависимости от изменения статуса продукта.
-        /// Если статус изменился с любого другого на ProductState.ZeroProduct, то номер партии увеличивается на 1.
+        /// Если статус изменился с <see cref="ProductState.IsHaveProduct"/> на <see cref="ProductState.ZeroProduct"/>, 
+        /// то номер партии увеличивается на 1.
         /// </summary>
         /// <param name="graphId">Идентификатор графика.</param>
         /// <param name="lastBatchNumber">Последний известный номер партии.</param>
-        /// <param name="entity">Объект с данными датчика ПЛК.</param>
+        /// <param name="plcSensorData">Объект с данными датчика ПЛК.</param>
         /// <returns>Обновлённый номер партии.</returns>
-        /// <exception cref="ArgumentNullException">Если параметр <paramref name="entity"/> равен null.</exception>
-        public int Adjust(int graphId, int lastBatchNumber, PlcSensorReading entity)
+        /// <exception cref="ArgumentNullException">Если параметр <paramref name="plcSensorData"/> равен null.</exception>
+        public int Adjust(int graphId, int lastBatchNumber, PlcSensorReading plcSensorData)
         {
-            if (entity == null)
+            if (plcSensorData == null)
             {
-                _logger.Warn("");
-                throw new ArgumentNullException(nameof(entity));
+                _logger.Warn($"Получены пустые данные с ПЛЦ для graphId={graphId}." +
+                    $"Не удалось выполнить коррекцию номера партии.");
+                throw new ArgumentNullException(nameof(plcSensorData));
             }
 
             var state = _graphStateManager.GetState(graphId);
 
-            var status = entity.Status;
+            var status = plcSensorData.Status;
 
             // Увеличиваем только если значение стало 0 и раньше было не 0
             if (status == ProductState.ZeroProduct && state.LastStatus != ProductState.ZeroProduct)
@@ -53,7 +55,7 @@ namespace LoggerDiagram.Services
             }
 
             // Обновляем состояние после обработки
-            state.LastStatus = entity.Status;
+            state.LastStatus = plcSensorData.Status;
             _graphStateManager.UpdateState(graphId, state);
 
             return lastBatchNumber;
