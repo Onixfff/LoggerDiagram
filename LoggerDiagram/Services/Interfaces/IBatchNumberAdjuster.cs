@@ -7,7 +7,8 @@ namespace LoggerDiagram.Services.Interfaces
     {
         /// <summary>
         /// Корректирует номер партии в зависимости от изменения статуса продукта.
-        /// Если статус изменился с любого другого на ProductState.ZeroProduct, то номер партии увеличивается на 1.
+        /// Если статус изменился с <see cref="ProductState.IsHaveProduct"/> на <see cref="ProductState.ZeroProduct"/>, 
+        /// то номер партии увеличивается на 1.
         /// </summary>
         /// <param name="graphId">Идентификатор графика.</param>
         /// <param name="lastBatchNumber">Последний известный номер партии.</param>
