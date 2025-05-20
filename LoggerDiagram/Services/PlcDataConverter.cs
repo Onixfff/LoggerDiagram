@@ -36,22 +36,20 @@ namespace LoggerDiagram.Services
         }
 
         /// <summary>
-        /// Асинхронно конвертирует список данных с ПЛК в список DTO.
-        /// Если количество входных ID не совпадает с количеством данных — обрабатывается минимальное из них.
+        /// Асинхронно преобразует список идентификаторов графиков и соответствующие данные с ПЛК в список DTO (<see cref="PlcLogEntityDto"/>).
+        /// Пары формируются по индексу: ids[0] + entity[0], ids[1] + entity[1] и т.д.
+        /// Если количество элементов в списках не совпадает — будет обработано минимальное количество.
         /// </summary>
-        /// <param name="ids">Список идентификаторов графиков.</param>
-        /// <param name="entity">Список данных с ПЛК.</param>
-        /// <param name="token">Токен отмены для прерывания операции.</param>
-        /// <returns>Список объектов <see cref="PlcLogEntityDto"/>.</returns>
-        /// <exception cref="ArgumentNullException">Выбрасывается, если <paramref name="ids"/> или <paramref name="entity"/> равны null.</exception>
-        /// <exception cref="OperationCanceledException">Если операция была отменена.</exception>
-        /// <exception cref="MySqlException">Ошибка со стороны базы данных.</exception>
-        /// <exception cref="InvalidCastException">Ошибка преобразования данных.</exception>
+        /// <param name="ids">Список идентификаторов графиков</param>
+        /// <param name="entity">Список данных с датчиков ПЛК</param>
+        /// <param name="token">Токен отмены для прерывания операции</param>
+        /// <returns>Список объектов <see cref="PlcLogEntityDto"/>. Возвращается пустой список, если ни одно значение не было обработано.</returns>
+        /// <exception cref="ArgumentNullException">Если любой из списков равен null</exception>
         public async Task<List<PlcLogEntityDto>> ConvertAsync(List<int> ids, List<PlcSensorReading> entity, CancellationToken token)
         {
-            if (entity == null) { throw new ArgumentNullException(nameof(entity), "Равен null"); }
+            if (entity == null) { throw new ArgumentNullException(nameof(entity), $"Список {nameof(entity)} null"); }
 
-            if (ids == null) { throw new ArgumentNullException(nameof(ids), "Равен null"); }
+            if (ids == null) { throw new ArgumentNullException(nameof(ids), $"Список {nameof(ids)} null"); }
 
             var dos = new List<PlcLogEntityDto>();
 
@@ -64,16 +62,32 @@ namespace LoggerDiagram.Services
 
             for (var i = 0; i < count; i++)
             {
-                    var dto = await ProcessItemAsync(ids[i], entity[i], token).ConfigureAwait(false);
+                var dto = await ProcessItemAsync(ids[i], entity[i], token).ConfigureAwait(false);
 
-                    if (dto != null)
-                    {
-                        dos.Add(dto);
-                    }
+                if (!dto.IsEmpty())
+                {
+                    dos.Add(dto);
+                }
             }
             return dos;
         }
 
+        /// <summary>
+        /// Асинхронно конвертирует данные с ПЛК в объект <see cref="PlcLogEntityDto"/> для указанного идентификатора графика.
+        /// При возникновении ошибки возвращается базовое значение, чтобы избежать NullReferenceException и обеспечить непрерывную обработку.
+        /// </summary>
+        /// <param name="id">Идентификаторор графика.</param>
+        /// <param name="entity">Данных с ПЛК.</param>
+        /// <param name="token">Токен отмены для прерывания операции.</param>
+        /// <returns>Объект <see cref="PlcLogEntityDto"/>. Может быть базовым значением</returns>
+        /// <remarks>
+        /// Следующие типы ошибок обрабатываются внутри метода:
+        /// - ArgumentNullException: если данные с датчика отсутствуют
+        /// - OperationCanceledException: если операция была отменена
+        /// - MySqlException: при ошибках подключения к БД
+        /// - InvalidCastException: при ошибках преобразования данных
+        /// Все ошибки логируются и не приводят к завершению процесса.
+        /// </remarks>
         private async Task<PlcLogEntityDto> ProcessItemAsync(int id, PlcSensorReading reading, CancellationToken token)
         {
             try
@@ -85,7 +99,7 @@ namespace LoggerDiagram.Services
                 if (reading.Status == ProductState.ZeroProduct)
                 {
                     _logger.Warn("Status равен {Status} для IdGraph = {IdGraph}",nameof(ProductState.ZeroProduct), id);
-                    return null;
+                    return PlcLogEntityDto.CreateBaseValue();
                 }
 
                 var uIntPtr = reading.RoomNumber;
@@ -93,28 +107,37 @@ namespace LoggerDiagram.Services
                 if (uIntPtr == null)
                 {
                     _logger.Warn("RoomNumber равно null для IdGraph = {IdGraph}", id);
-                    return null;
+                    return PlcLogEntityDto.CreateBaseValue();
                 }
 
                 var dto = PlcLogEntityDto.Create((int)uIntPtr, batch, reading.Status, reading.Value, reading.Time);
                 return dto;
 
             }
-            catch (ArgumentNullException)
+            catch (ArgumentNullException ex)
             {
-                throw;
+                _logger.Error(ex, "Ошибка: Не переданы данные с датчика для IdGraph = {IdGraph}", id);
+                return PlcLogEntityDto.CreateBaseValue();
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                throw;
+                _logger.Warn(ex, "Операция отменена для IdGraph = {IdGraph}", id);
+                return PlcLogEntityDto.CreateBaseValue();
             }
-            catch (MySqlException)
+            catch (MySqlException ex)
             {
-                throw;
+                _logger.Error(ex, "Ошибка базы данных при обработке IdGraph = {IdGraph}", id);
+                return PlcLogEntityDto.CreateBaseValue();
             }
-            catch (InvalidCastException)
+            catch (InvalidCastException ex)
             {
-                throw;
+                _logger.Error(ex, "Ошибка преобразования RoomNumber для IdGraph = {IdGraph}", id);
+                return PlcLogEntityDto.CreateBaseValue();
+            }
+            catch (Exception ex)
+            {
+                _logger.Fatal(ex, "Неизвестная ошибка при обработке IdGraph = {IdGraph}", id);
+                return PlcLogEntityDto.CreateBaseValue();
             }
         }
     }
