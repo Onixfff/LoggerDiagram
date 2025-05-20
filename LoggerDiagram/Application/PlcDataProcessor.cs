@@ -59,20 +59,40 @@ namespace LoggerDiagram.Application
         
         private async Task ProcessGroupAsync(List<int> ids, string ip,  CancellationToken token)
         {
-            IPlcDataReader reader = _readerFactory.Create(ip);
-            var data = await _readerService.GetPlcSensorReadingsAsync(ids, reader, token);
-            
-            if(data == null)
-                return;
-            
-            //TODO Доделать Try catch
-            var dtos = await _converter.ConvertAsync(ids, data, token);
-            
-            if (dtos == null)
-                return;
+            try
+            {
+                IPlcDataReader reader = _readerFactory.Create(ip);
+                var data = await _readerService.GetPlcSensorReadingsAsync(ids, reader, token);
 
-            //TODO ДОДЕЛАТЬ Try catch
-            await _sender.SendAsync(dtos, token);
+                if (data == null)
+                {
+                    _logger.Warn("Данные с PLC равны null для IP: {Ip}", ip);
+                    return;
+                }
+
+                var dtos = await _converter.ConvertAsync(ids, data, token);
+
+                if (dtos == null)
+                {
+                    _logger.Warn("Не найдено данных для отправки для IP: {Ip}", ip);
+                    return;
+                }
+
+                //TODO ДОДЕЛАТЬ Try catch
+                await _sender.SendAsync(dtos, token);
+            }
+            catch (ArgumentNullException ex)
+            {
+                _logger.Error(ex, "Ошибка: Неверные аргументы при обработке группы для IP: {Ip}", ip);
+            }
+            catch (OperationCanceledException ex)
+            {
+                _logger.Warn(ex, "Операция отменена для IP: {Ip}", ip);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Неизвестная ошибка при обработке группы для IP: {Ip}", ip);
+            }
         }
 
     }
