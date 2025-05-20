@@ -3,6 +3,9 @@ using LoggerDiagram.Models.Plc;
 
 namespace LoggerDiagram.Services.Interfaces
 {
+    /// <summary>
+    /// интерфейс для конвертации данных с ПЛК (<see cref="PlcSensorReading"/>) в DTO (<see cref="PlcLogEntityDto"/>).
+    /// </summary>
     public interface IBatchNumberAdjuster
     {
         /// <summary>
