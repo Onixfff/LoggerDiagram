@@ -29,6 +29,8 @@ namespace LoggerDiagram.DataAccess
         ";
             try
             {
+                if (plcLogEntryDto == null) throw new ArgumentNullException(nameof(plcLogEntryDto));
+
                 using (var connection = new MySqlConnection(_connectionString))
                 {
                     token.ThrowIfCancellationRequested();
