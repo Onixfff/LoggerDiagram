@@ -1,10 +1,12 @@
-﻿using LoggerDiagram.DataAccess;
-using LoggerDiagram.DTO;
-using LoggerDiagram.Services.Interfaces;
-using NLog;
-using System.Collections.Generic;
+﻿using NLog;
+using System;
 using System.Threading;
+using LoggerDiagram.DTO;
 using System.Threading.Tasks;
+using LoggerDiagram.DataAccess;
+using System.Collections.Generic;
+using LoggerDiagram.Services.Interfaces;
+using LoggerDiagram.DataBaseExcepitons;
 
 namespace LoggerDiagram.Services
 {
@@ -19,12 +21,40 @@ namespace LoggerDiagram.Services
             _logger = logger;
         }
 
-        public async Task SendAsync(IEnumerable<PlcLogEntityDto> dtos, CancellationToken token)
+        public async Task SendAsync(IEnumerable<PlcLogEntityDto> dtos, CancellationToken token, int maxRetries = 3)
         {
-            foreach (var dto in dtos)
+            int attempt = 0;
+            int delay = 2000;
+            int retryDelayInSeconds = delay / 1000;
+
+            while (attempt < maxRetries)
             {
-                await _repository.SendDataAsync(dto, token);
-                _logger.Info("Отправлено {0}", dto.IdGraph);
+                try
+                {
+                    await _repository.BulkInsertWithValuesAsync(dtos, token).ConfigureAwait(false);
+                    return;
+                }
+                catch (InsertException ex)
+                {
+                    attempt++;
+                    _logger.Warn(ex, $"Попытка {attempt} не удалась. Повтор через {retryDelayInSeconds} сек.");
+                    await Task.Delay(delay, token);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    _logger.Info(ex, "Данные не добавлены в бд");
+                    return;
+                }
+                catch (ArgumentNullException ex)
+                {
+                    _logger.Info(ex, "Не переданы данные для отправки в БД");
+                    return;
+                }
+                catch(Exception ex)
+                {
+                    _logger.Info(ex, "Данные не добавлены в бд");
+                    return;
+                }
             }
         }
     }

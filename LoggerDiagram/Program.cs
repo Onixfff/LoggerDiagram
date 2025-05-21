@@ -26,6 +26,10 @@ namespace LoggerDiagram
                 {
                     await application.ProcessAsync(cts.Token);
                 }
+                catch(ArgumentNullException ex)
+                {
+                    logger.Error(ex, "Пойман null exception");
+                }
                 catch (OperationCanceledException ex)
                 {
                     logger.Error(ex,"Операция была отменена.");

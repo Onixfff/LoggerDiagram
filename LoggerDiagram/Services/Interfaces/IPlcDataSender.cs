@@ -7,6 +7,6 @@ namespace LoggerDiagram.Services.Interfaces
 {
     public interface IPlcDataSender
     {
-        Task SendAsync(IEnumerable<PlcLogEntityDto> dtos, CancellationToken token);
+        Task SendAsync(IEnumerable<PlcLogEntityDto> dtos, CancellationToken token, int maxRetries = 3);
     }
 }

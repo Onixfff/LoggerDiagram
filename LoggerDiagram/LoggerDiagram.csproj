@@ -129,6 +129,7 @@
     <Compile Include="Application\PlcDataProcessor.cs" />
     <Compile Include="DataAccess\DataBaseRepository.cs" />
     <Compile Include="DataAccess\IDataBaseRepository.cs" />
+    <Compile Include="DataBaseExcepitons\InsertException.cs" />
     <Compile Include="DependencyInjection\ContainerConfig.cs" />
     <Compile Include="DTO\PlcLogEntityDto.cs" />
     <Compile Include="Enums\ProductState.cs" />

@@ -1,11 +1,13 @@
-﻿using LoggerDiagram.DTO;
-using MySql.Data.MySqlClient;
-using NLog;
+﻿using NLog;
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
+using System.Text;
 using System.Threading;
+using LoggerDiagram.DTO;
+using System.Data.Common;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
+using System.Collections.Generic;
+using LoggerDiagram.DataBaseExcepitons;
 
 namespace LoggerDiagram.DataAccess
 {
@@ -18,6 +20,92 @@ namespace LoggerDiagram.DataAccess
         {
             _connectionString = connectionString;
             _logger = logger;
+        }
+
+        /// <summary>
+        /// Асинхронно выполняет массовую вставку данных из коллекции <see cref="PlcLogEntityDto"/> в таблицу MySQL.
+        /// Вставка выполняется с помощью одного SQL-запроса типа INSERT INTO ... VALUES (...), (...).
+        /// </summary>
+        /// <param name="dtos">Коллекция объектов <see cref="PlcLogEntityDto"/>, которые будут сохранены в базе данных.</param>
+        /// <param name="token">Токен отмены, позволяющий прервать операцию.</param>
+        /// <exception cref="ArgumentNullException">Выбрасывается, если <paramref name="dtos"/> равен null.</exception>
+        /// <exception cref="OperationCanceledException">Выбрасывается, если операция была отменена через <paramref name="token"/>.</exception>
+        /// <exception cref="InsertException">Выбрасывается при ошибках взаимодействия с базой данных MySQL. 
+        /// И при других ошибках работы с базой данных.</exception>
+        /// <exception cref="Exception">Выбрасывается при прочих непредвиденных ошибках.</exception>
+        /// <remarks>
+        /// Метод формирует SQL-запрос путём объединения всех записей в одну строку и отправляет их одним вызовом.
+        /// Для повышения производительности рекомендуется использовать не более 500–1000 записей за один вызов,
+        /// чтобы избежать переполнения строки или ограничений сервера.
+        /// </remarks>
+        public async Task BulkInsertWithValuesAsync(IEnumerable<PlcLogEntityDto> dtos, CancellationToken token)
+        {
+            var sb = new StringBuilder();
+            sb.Append(@"INSERT INTO `diagramrooms`.`datapoints`
+                        (`IdGraph`, `BatchNumber`, `NowTime`, `Value`, `Time`)
+                        VALUES ");
+
+            if (dtos == null) throw new ArgumentNullException(nameof(dtos));
+
+            int count = 0;
+            bool first = true;
+            foreach (var dto in dtos)
+            {
+                if (!first) sb.Append(",");
+
+                sb.AppendFormat(
+                    "({0}, {1}, {2}, {3}, {4})",
+                    dto.IdGraph,
+                    dto.BatchNumber,
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    dto.Value,
+                    dto.Time
+                    );
+
+                count++;
+                first = false;
+            }
+
+            if (first) return; //Нет данных
+
+            string sql = sb.ToString();
+
+            try
+            {
+                using (var connection = new MySqlConnection(_connectionString))
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    await connection.OpenAsync(token).ConfigureAwait(false);
+                    
+                    using (var command = new MySqlCommand(sql, connection)) 
+                    {
+                        int rowsAffected = await command.ExecuteNonQueryAsync(token).ConfigureAwait(false);
+                        _logger.Info("Данных отравлено {Count}", count);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.Warn("Операция была отменена");
+                throw;
+            }
+            catch (MySqlException ex)
+            {
+                string errorMessage = "Ошибка со стороны базы данных";
+                _logger.Error(ex, errorMessage);
+            }
+            catch (DbException ex)
+            {
+                string errorMessage = "Непредвиденная ошибка с базой данных";
+                _logger.Error(ex, errorMessage);
+                throw new InsertException(errorMessage, ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Непредвиденная ошибка");
+                throw;
+            }
         }
 
         public async Task SendDataAsync(PlcLogEntityDto plcLogEntryDto, CancellationToken token)

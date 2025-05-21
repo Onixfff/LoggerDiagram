@@ -10,6 +10,24 @@ namespace LoggerDiagram.DataAccess
         Task SendDataAsync(PlcLogEntityDto plcLogEntryDto, CancellationToken token);
 
         /// <summary>
+        /// Асинхронно выполняет массовую вставку данных из коллекции <see cref="PlcLogEntityDto"/> в таблицу MySQL.
+        /// Вставка выполняется с помощью одного SQL-запроса типа INSERT INTO ... VALUES (...), (...).
+        /// </summary>
+        /// <param name="dtos">Коллекция объектов <see cref="PlcLogEntityDto"/>, которые будут сохранены в базе данных.</param>
+        /// <param name="token">Токен отмены, позволяющий прервать операцию.</param>
+        /// <exception cref="ArgumentNullException">Выбрасывается, если <paramref name="dtos"/> равен null.</exception>
+        /// <exception cref="OperationCanceledException">Выбрасывается, если операция была отменена через <paramref name="token"/>.</exception>
+        /// <exception cref="InsertException">Выбрасывается при ошибках взаимодействия с базой данных MySQL. 
+        /// И при других ошибках работы с базой данных.</exception>
+        /// <exception cref="Exception">Выбрасывается при прочих непредвиденных ошибках.</exception>
+        /// <remarks>
+        /// Метод формирует SQL-запрос путём объединения всех записей в одну строку и отправляет их одним вызовом.
+        /// Для повышения производительности рекомендуется использовать не более 500–1000 записей за один вызов,
+        /// чтобы избежать переполнения строки или ограничений сервера.
+        /// </remarks>
+        Task BulkInsertWithValuesAsync(IEnumerable<PlcLogEntityDto> dtos, CancellationToken token);
+
+        /// <summary>
         /// Асинхронно получает последнее значение номера партии (BatchNumber) для указанного графика из базы данных.
         /// Если данные отсутствуют, возвращается 0.
         /// </summary>
