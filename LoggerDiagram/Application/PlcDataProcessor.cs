@@ -1,12 +1,12 @@
-﻿using LoggerDiagram.DataAccess;
-using LoggerDiagram.Services;
-using LoggerDiagram.Services.Interfaces;
-using NLog;
+﻿using NLog;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Threading;
+using System.Configuration;
+using LoggerDiagram.Services;
 using System.Threading.Tasks;
+using LoggerDiagram.DataAccess;
+using System.Collections.Generic;
+using LoggerDiagram.Services.Interfaces;
 
 namespace LoggerDiagram.Application
 {
@@ -28,7 +28,7 @@ namespace LoggerDiagram.Application
             _sender = sender;
             _readerFactory = readerFactory;
             _logger = logger;
-        }   
+        }
 
         public async Task ProcessAsync(CancellationToken token)
         {
@@ -94,6 +94,5 @@ namespace LoggerDiagram.Application
                 _logger.Error(ex, "Неизвестная ошибка при обработке группы для IP: {Ip}", ip);
             }
         }
-
     }
 }
