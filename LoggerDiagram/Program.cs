@@ -1,10 +1,10 @@
-﻿using Autofac;
-using LoggerDiagram.Application;
-using LoggerDiagram.DependencyInjection;
-using NLog;
+﻿using NLog;
 using System;
+using Autofac;
 using System.Threading;
 using System.Threading.Tasks;
+using LoggerDiagram.Application;
+using LoggerDiagram.DependencyInjection;
 
 namespace LoggerDiagram
 {
@@ -20,24 +20,35 @@ namespace LoggerDiagram
                 var application = score.Resolve<PlcDataProcessor>();
                 var logger = score.Resolve<ILogger>();
 
+                TimeSpan interval = TimeSpan.FromSeconds(60); // Интервал между запусками
                 var cts = new CancellationTokenSource();
 
-                try
+                while (!cts.Token.IsCancellationRequested)
                 {
-                    await application.ProcessAsync(cts.Token);
+                    try
+                    {
+                        await application.ProcessAsync(cts.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex, "Неизвестая ошибка.");
+                    }
+
+                    try
+                    {
+                        await Task.Delay(interval, cts.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Просто выйдем из задержки, если отменено
+                    }
                 }
-                catch(ArgumentNullException ex)
-                {
-                    logger.Error(ex, "Пойман null exception");
-                }
-                catch (OperationCanceledException ex)
-                {
-                    logger.Error(ex,"Операция была отменена.");
-                }
-                catch (Exception ex)
-                {
-                    logger.Error(ex, "Неизвестая ошибка.");
-                }
+
+                logger.Info("Программа завершила работу.");
             }
         }
     }
